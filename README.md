@@ -1,98 +1,233 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Super Squads Backend
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+A NestJS backend powering a gated "Internshala-like" marketplace exclusively for Tier-1 students and verified recruiters.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Architecture
 
-## Description
+- **API**: NestJS with modular architecture
+- **Auth**: Supabase Auth (JWT) with Google/LinkedIn OAuth
+- **Database**: Neon Postgres with TypeORM
+- **Cache/Rate Limiting**: Redis (Upstash or managed)
+- **Storage**: S3-compatible storage (AWS S3, Cloudflare R2, or Supabase Storage)
+- **Validation**: Zod schemas for all inputs
+- **Security**: JWT verification, RBAC, college email verification
+- **Observability**: Pino logging, health checks
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Features
 
-## Project setup
+### Authentication & Authorization
+- ✅ Supabase JWT verification
+- ✅ Role-based access control (Student, Recruiter, Admin)
+- ✅ College email verification for Tier-1 students
+- ✅ Webhook-based user synchronization
 
+### Security
+- ✅ Rate limiting with Redis
+- ✅ Zod validation for all inputs
+- ✅ Helmet security headers
+- ✅ CORS configuration
+- ✅ JWT audience and issuer validation
+
+### Infrastructure
+- ✅ Health checks (/health, /ready)
+- ✅ Docker containerization
+- ✅ Environment validation with Zod
+- ✅ Comprehensive logging
+- ✅ Database migrations ready
+
+## Quick Start
+
+### Prerequisites
+- Node.js 18+
+- Docker & Docker Compose
+- PostgreSQL (or use Docker)
+- Redis (or use Docker)
+
+### Environment Setup
+
+1. Copy the environment template:
 ```bash
-$ npm install
+cp .env.example .env
 ```
 
-## Compile and run the project
-
+2. Update `.env` with your actual values:
 ```bash
-# development
-$ npm run start
+# Required: Database
+DATABASE_URL=postgresql://username:password@host:5432/database
 
-# watch mode
-$ npm run start:dev
+# Required: Redis
+REDIS_URL=redis://localhost:6379
 
-# production mode
-$ npm run start:prod
+# Required: Supabase
+SUPABASE_PROJECT_URL=https://your-project.supabase.co
+SUPABASE_ANON_KEY=your-anon-key
+SUPABASE_JWT_SECRET=your-jwt-secret
+SUPABASE_WEBHOOK_SECRET=your-webhook-secret
+
+# Required: Security
+JWT_SECRET=your-super-secret-jwt-key-at-least-32-characters-long
 ```
 
-## Run tests
+### Development with Docker
 
 ```bash
-# unit tests
-$ npm run test
+# Start all services (app, postgres, redis)
+npm run docker:dev
 
-# e2e tests
-$ npm run test:e2e
+# Or manually:
+docker-compose up --build
+```
 
-# test coverage
-$ npm run test:cov
+### Local Development
+
+```bash
+# Install dependencies
+npm install
+
+# Start development server
+npm run start:dev
+
+# Run tests
+npm test
+
+# Run e2e tests
+npm run test:e2e
+```
+
+## API Endpoints
+
+### Authentication
+- `POST /api/v1/auth/webhooks/supabase` - Sync users from Supabase
+- `GET /api/v1/auth/me` - Get current user info
+- `POST /api/v1/auth/verify-college` - Send college verification email
+- `POST /api/v1/auth/verify-college/callback` - Verify college email token
+
+### Health Checks
+- `GET /api/v1/health` - Basic health check
+- `GET /api/v1/ready` - Readiness check (DB + Redis)
+
+### Documentation
+- `GET /api/docs` - Swagger documentation (development only)
+
+## Database Schema
+
+The application includes comprehensive entities for:
+
+- **Users**: Core user management with Supabase integration
+- **Colleges**: Tier-1 college domain allowlist
+- **Companies**: Recruiter company profiles
+- **Jobs**: Job postings with skills, locations, work modes
+- **Applications**: Student job applications with status tracking
+- **Student Profiles**: Detailed student information
+- **Skills**: Skill catalog with proficiency levels
+- **Files**: File management for resumes, documents
+- **Notifications**: Email/push notification tracking
+
+## Security Features
+
+### JWT Verification
+- Verifies Supabase JWTs using JWKS
+- Validates audience and issuer
+- Automatic user creation/sync
+
+### Rate Limiting
+- Global: 100 requests/60s per IP
+- Sensitive routes have stricter limits
+- Redis-backed for distributed systems
+
+### College Verification
+- Email domain validation against Tier-1 colleges
+- Magic link verification process
+- Required for student access to job applications
+
+### Role-Based Access Control
+```typescript
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles(UserRole.STUDENT)
+@UseGuards(CollegeVerifiedGuard) // For students only
 ```
 
 ## Deployment
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
+### Production Environment Variables
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+NODE_ENV=production
+DATABASE_URL=postgresql://... # Neon connection string
+REDIS_URL=redis://... # Upstash or managed Redis
+SUPABASE_PROJECT_URL=https://...
+# ... other required vars
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+### Docker Production
+```bash
+docker build -t super-squads-backend .
+docker run -p 3000:3000 --env-file .env super-squads-backend
+```
 
-## Resources
+### Health Checks
+The application provides health checks for:
+- Database connectivity
+- Redis connectivity
+- Basic service status
 
-Check out a few resources that may come in handy when working with NestJS:
+## Development
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+### Adding New Modules
+1. Create entity in `src/entities/`
+2. Create DTOs with Zod schemas in `src/modules/*/dto/`
+3. Create service and controller
+4. Add module to `AppModule`
+5. Generate and run migrations
 
-## Support
+### Database Migrations
+```bash
+# Generate migration
+npm run migration:generate src/migrations/YourMigrationName
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+# Run migrations
+npm run migration:run
 
-## Stay in touch
+# Revert last migration
+npm run migration:revert
+```
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+### Testing
+```bash
+# Unit tests
+npm test
+
+# Watch mode
+npm run test:watch
+
+# Coverage
+npm run test:cov
+
+# E2E tests
+npm run test:e2e
+```
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests
+5. Update documentation
+6. Submit a pull request
+
+## Next Steps
+
+To complete the implementation:
+
+1. **Add remaining modules**: Jobs, Applications, Profiles, Skills
+2. **Implement file upload**: S3/R2 integration with resume parsing
+3. **Add email service**: Postmark/SES integration for notifications
+4. **Create recommendation engine**: Job matching algorithm
+5. **Add search functionality**: Elasticsearch or PostgreSQL full-text search
+6. **Implement real-time features**: WebSockets for notifications
+7. **Add monitoring**: OpenTelemetry, metrics, alerts
+8. **Set up CI/CD**: GitHub Actions for automated testing and deployment
 
 ## License
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+Private - All rights reserved
