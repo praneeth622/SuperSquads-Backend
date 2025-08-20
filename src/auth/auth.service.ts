@@ -1,4 +1,8 @@
-import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
@@ -25,7 +29,10 @@ export class AuthService {
     return this.userRepository.findOne({ where: { email } });
   }
 
-  async verifyCollegeEmail(user: User, collegeEmail: string): Promise<{ token: string; expiresAt: Date }> {
+  async verifyCollegeEmail(
+    user: User,
+    collegeEmail: string,
+  ): Promise<{ token: string; expiresAt: Date }> {
     const emailDomain = collegeEmail.split('@')[1];
 
     // Check if domain is in allowed colleges
@@ -35,7 +42,7 @@ export class AuthService {
 
     if (!college) {
       throw new BadRequestException(
-        'This email domain is not from an eligible college. Please use your official college email address.'
+        'This email domain is not from an eligible college. Please use your official college email address.',
       );
     }
 
@@ -64,8 +71,13 @@ export class AuthService {
       throw new NotFoundException('Invalid verification token');
     }
 
-    if (!user.verification_token_expires_at || user.verification_token_expires_at < new Date()) {
-      throw new BadRequestException('Verification token has expired. Please request a new verification email.');
+    if (
+      !user.verification_token_expires_at ||
+      user.verification_token_expires_at < new Date()
+    ) {
+      throw new BadRequestException(
+        'Verification token has expired. Please request a new verification email.',
+      );
     }
 
     // Mark user as verified
@@ -78,7 +90,9 @@ export class AuthService {
     });
 
     // Fetch updated user
-    const updatedUser = await this.userRepository.findOne({ where: { id: user.id } });
+    const updatedUser = await this.userRepository.findOne({
+      where: { id: user.id },
+    });
     return updatedUser!;
   }
 

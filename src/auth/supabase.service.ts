@@ -21,7 +21,7 @@ export class SupabaseService {
   async verifyJWT(token: string): Promise<any> {
     try {
       const { data: user, error } = await this.supabase.auth.getUser(token);
-      
+
       if (error) {
         throw new Error(`JWT verification failed: ${error.message}`);
       }

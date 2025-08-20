@@ -13,6 +13,8 @@ import { ApplicationsModule } from './applications/applications.module';
 import { CompaniesModule } from './companies/companies.module';
 import { StudentProfilesModule } from './student-profiles/student-profiles.module';
 import { FilesModule } from './files/files.module';
+import { NotificationsModule } from './notifications/notifications.module';
+import { SkillsModule } from './skills/skills.module';
 import { validateEnv, Environment } from './config/env.schema';
 import { getDatabaseConfig } from './config/database.config';
 import { getRedisConfig } from './config/redis.config';
@@ -25,14 +27,14 @@ import { getRedisConfig } from './config/redis.config';
       validate: validateEnv,
       envFilePath: ['.env.local', '.env'],
     }),
-    
+
     // Database
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: getDatabaseConfig,
       inject: [ConfigService],
     }),
-    
+
     // Redis Cache
     CacheModule.registerAsync({
       imports: [ConfigModule],
@@ -40,7 +42,7 @@ import { getRedisConfig } from './config/redis.config';
       inject: [ConfigService],
       isGlobal: true,
     }),
-    
+
     // Rate Limiting
     ThrottlerModule.forRootAsync({
       imports: [ConfigModule],
@@ -54,7 +56,7 @@ import { getRedisConfig } from './config/redis.config';
       }),
       inject: [ConfigService],
     }),
-    
+
     // Logging
     LoggerModule.forRootAsync({
       imports: [ConfigModule],
@@ -72,7 +74,7 @@ import { getRedisConfig } from './config/redis.config';
       }),
       inject: [ConfigService],
     }),
-    
+
     // Feature modules
     AuthModule,
     JobsModule,
@@ -80,6 +82,8 @@ import { getRedisConfig } from './config/redis.config';
     CompaniesModule,
     StudentProfilesModule,
     FilesModule,
+    NotificationsModule,
+    SkillsModule,
     HealthModule,
   ],
   controllers: [AppController],

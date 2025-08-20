@@ -44,12 +44,15 @@ import { VerificationStatus } from '../entities/student-profile.entity';
 )
 @Controller('student-profiles')
 export class StudentProfilesController {
-  constructor(private readonly studentProfilesService: StudentProfilesService) {}
+  constructor(
+    private readonly studentProfilesService: StudentProfilesService,
+  ) {}
 
   @Post()
   @ApiOperation({
     summary: 'Create student profile',
-    description: 'Create a comprehensive student profile with education, experience, and project details',
+    description:
+      'Create a comprehensive student profile with education, experience, and project details',
   })
   @ApiBody({
     type: CreateStudentProfileDto,
@@ -64,14 +67,23 @@ export class StudentProfilesController {
           email: 'john.doe@university.edu',
           phone: '+1-555-123-4567',
           location: 'San Francisco, CA',
-          headline: 'Computer Science Student | Full-Stack Developer | AI Enthusiast',
-          summary: 'Passionate computer science student with 2+ years of experience in full-stack development. Specialized in React, Node.js, and machine learning applications.',
+          headline:
+            'Computer Science Student | Full-Stack Developer | AI Enthusiast',
+          summary:
+            'Passionate computer science student with 2+ years of experience in full-stack development. Specialized in React, Node.js, and machine learning applications.',
           portfolio_url: 'https://johndoe.dev',
           linkedin_url: 'https://linkedin.com/in/johndoe',
           github_url: 'https://github.com/johndoe',
           availability_status: 'available',
           desired_job_types: ['full-time', 'internship'],
-          skills: ['JavaScript', 'Python', 'React', 'Node.js', 'PostgreSQL', 'Docker'],
+          skills: [
+            'JavaScript',
+            'Python',
+            'React',
+            'Node.js',
+            'PostgreSQL',
+            'Docker',
+          ],
           languages: ['English (Native)', 'Spanish (Conversational)'],
           education: [
             {
@@ -82,8 +94,8 @@ export class StudentProfilesController {
               start_date: '2020-09-01',
               end_date: '2024-05-15',
               gpa: 3.8,
-              description: 'Magna Cum Laude, Dean\'s List 2022-2024'
-            }
+              description: "Magna Cum Laude, Dean's List 2022-2024",
+            },
           ],
           experience: [
             {
@@ -92,21 +104,29 @@ export class StudentProfilesController {
               level: 'entry',
               start_date: '2023-06-01',
               end_date: '2023-08-31',
-              description: 'Developed microservices using Go and Python, improved system performance by 25%',
-              technologies: ['Go', 'Python', 'Kubernetes', 'gRPC']
-            }
+              description:
+                'Developed microservices using Go and Python, improved system performance by 25%',
+              technologies: ['Go', 'Python', 'Kubernetes', 'gRPC'],
+            },
           ],
           projects: [
             {
               name: 'AI-Powered Job Matching Platform',
-              description: 'A full-stack web application that uses machine learning to match students with relevant job opportunities',
-              technologies: ['React', 'Node.js', 'Python', 'TensorFlow', 'PostgreSQL'],
+              description:
+                'A full-stack web application that uses machine learning to match students with relevant job opportunities',
+              technologies: [
+                'React',
+                'Node.js',
+                'Python',
+                'TensorFlow',
+                'PostgreSQL',
+              ],
               repository_url: 'https://github.com/johndoe/ai-job-matching',
               demo_url: 'https://ai-job-matching.vercel.app',
               start_date: '2024-01-15',
-              end_date: '2024-03-30'
-            }
-          ]
+              end_date: '2024-03-30',
+            },
+          ],
         },
       },
     },
@@ -123,7 +143,8 @@ export class StudentProfilesController {
       phone: '+1-555-123-4567',
       location: 'San Francisco, CA',
       headline: 'Computer Science Student | Full-Stack Developer',
-      summary: 'Passionate computer science student with experience in full-stack development',
+      summary:
+        'Passionate computer science student with experience in full-stack development',
       portfolio_url: 'https://johndoe.dev',
       linkedin_url: 'https://linkedin.com/in/johndoe',
       github_url: 'https://github.com/johndoe',
@@ -135,7 +156,7 @@ export class StudentProfilesController {
       experience: [],
       projects: [],
       created_at: '2024-01-15T10:30:00Z',
-      updated_at: '2024-01-15T10:30:00Z'
+      updated_at: '2024-01-15T10:30:00Z',
     },
   })
   @ApiResponse({
@@ -144,7 +165,7 @@ export class StudentProfilesController {
     example: {
       statusCode: 409,
       message: 'Profile already exists for this user',
-      error: 'Conflict'
+      error: 'Conflict',
     },
   })
   @ApiResponse({
@@ -153,7 +174,7 @@ export class StudentProfilesController {
     example: {
       statusCode: 400,
       message: ['first_name must be longer than or equal to 2 characters'],
-      error: 'Bad Request'
+      error: 'Bad Request',
     },
   })
   async createProfile(
@@ -167,7 +188,8 @@ export class StudentProfilesController {
   @Get()
   @ApiOperation({
     summary: 'Get all student profiles',
-    description: 'Retrieve student profiles with advanced filtering, searching, and pagination',
+    description:
+      'Retrieve student profiles with advanced filtering, searching, and pagination',
   })
   @ApiQuery({
     name: 'name',
@@ -249,13 +271,13 @@ export class StudentProfilesController {
           availability_status: 'available',
           skills: ['JavaScript', 'Python', 'React'],
           created_at: '2024-01-15T10:30:00Z',
-          updated_at: '2024-01-15T10:30:00Z'
-        }
+          updated_at: '2024-01-15T10:30:00Z',
+        },
       ],
       total: 150,
       page: 1,
       limit: 20,
-      totalPages: 8
+      totalPages: 8,
     },
   })
   async getAllProfiles(@Query() searchDto: StudentProfileSearchDto) {
@@ -265,7 +287,7 @@ export class StudentProfilesController {
   @Get('me')
   @ApiOperation({
     summary: 'Get current user profile',
-    description: 'Retrieve the authenticated user\'s student profile',
+    description: "Retrieve the authenticated user's student profile",
   })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -277,8 +299,9 @@ export class StudentProfilesController {
     description: 'Profile not found for current user',
     example: {
       statusCode: 404,
-      message: 'Student profile not found for user 550e8400-e29b-41d4-a716-446655440000',
-      error: 'Not Found'
+      message:
+        'Student profile not found for user 550e8400-e29b-41d4-a716-446655440000',
+      error: 'Not Found',
     },
   })
   async getCurrentUserProfile(@Request() req: any): Promise<any> {
@@ -300,13 +323,13 @@ export class StudentProfilesController {
         none: 450,
         pending: 150,
         verified: 600,
-        rejected: 50
+        rejected: 50,
       },
       by_opportunity_availability: {
         open: 850,
-        closed: 400
+        closed: 400,
       },
-      recent_profiles: 25
+      recent_profiles: 25,
     },
   })
   async getProfileStats() {
@@ -333,8 +356,9 @@ export class StudentProfilesController {
     description: 'Profile not found',
     example: {
       statusCode: 404,
-      message: 'Student profile not found for user 550e8400-e29b-41d4-a716-446655440000',
-      error: 'Not Found'
+      message:
+        'Student profile not found for user 550e8400-e29b-41d4-a716-446655440000',
+      error: 'Not Found',
     },
   })
   async getProfileByUserId(
@@ -346,7 +370,8 @@ export class StudentProfilesController {
   @Put('me')
   @ApiOperation({
     summary: 'Update current user profile',
-    description: 'Update the authenticated user\'s student profile with new information',
+    description:
+      "Update the authenticated user's student profile with new information",
   })
   @ApiBody({
     type: UpdateStudentProfileDto,
@@ -357,10 +382,11 @@ export class StudentProfilesController {
         description: 'Update specific fields of the profile',
         value: {
           headline: 'Senior Computer Science Student | Full-Stack Developer',
-          summary: 'Experienced computer science student with 3+ years in full-stack development',
+          summary:
+            'Experienced computer science student with 3+ years in full-stack development',
           skills: ['JavaScript', 'Python', 'React', 'Node.js', 'AWS', 'Docker'],
           availability_status: 'open_to_offers',
-          desired_job_types: ['full-time', 'remote']
+          desired_job_types: ['full-time', 'remote'],
         },
       },
       'experience-update': {
@@ -374,10 +400,11 @@ export class StudentProfilesController {
               level: 'junior',
               start_date: '2024-06-01',
               end_date: '2024-08-31',
-              description: 'Worked on React components for Instagram web platform',
-              technologies: ['React', 'TypeScript', 'GraphQL', 'Jest']
-            }
-          ]
+              description:
+                'Worked on React components for Instagram web platform',
+              technologies: ['React', 'TypeScript', 'GraphQL', 'Jest'],
+            },
+          ],
         },
       },
     },
@@ -392,8 +419,9 @@ export class StudentProfilesController {
     description: 'Profile not found',
     example: {
       statusCode: 404,
-      message: 'Student profile not found for user 550e8400-e29b-41d4-a716-446655440000',
-      error: 'Not Found'
+      message:
+        'Student profile not found for user 550e8400-e29b-41d4-a716-446655440000',
+      error: 'Not Found',
     },
   })
   async updateCurrentUserProfile(
@@ -407,7 +435,7 @@ export class StudentProfilesController {
   @Delete('me')
   @ApiOperation({
     summary: 'Delete current user profile',
-    description: 'Delete the authenticated user\'s student profile permanently',
+    description: "Delete the authenticated user's student profile permanently",
   })
   @ApiResponse({
     status: HttpStatus.NO_CONTENT,
@@ -418,8 +446,9 @@ export class StudentProfilesController {
     description: 'Profile not found',
     example: {
       statusCode: 404,
-      message: 'Student profile not found for user 550e8400-e29b-41d4-a716-446655440000',
-      error: 'Not Found'
+      message:
+        'Student profile not found for user 550e8400-e29b-41d4-a716-446655440000',
+      error: 'Not Found',
     },
   })
   async deleteCurrentUserProfile(@Request() req: any): Promise<void> {

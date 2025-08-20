@@ -1,19 +1,19 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { 
-  IsString, 
-  IsEmail, 
-  IsOptional, 
-  IsArray, 
-  IsEnum, 
-  IsDateString, 
-  IsNumber, 
-  Min, 
-  Max, 
+import {
+  IsString,
+  IsEmail,
+  IsOptional,
+  IsArray,
+  IsEnum,
+  IsDateString,
+  IsNumber,
+  Min,
+  Max,
   IsUrl,
   IsUUID,
   ArrayMaxSize,
   MaxLength,
-  MinLength
+  MinLength,
 } from 'class-validator';
 
 export enum EducationLevel {
@@ -23,7 +23,7 @@ export enum EducationLevel {
   MASTER = 'master',
   PHD = 'phd',
   BOOTCAMP = 'bootcamp',
-  CERTIFICATION = 'certification'
+  CERTIFICATION = 'certification',
 }
 
 export enum ExperienceLevel {
@@ -32,19 +32,19 @@ export enum ExperienceLevel {
   MID = 'mid',
   SENIOR = 'senior',
   LEAD = 'lead',
-  PRINCIPAL = 'principal'
+  PRINCIPAL = 'principal',
 }
 
 export enum AvailabilityStatus {
   AVAILABLE = 'available',
   OPEN_TO_OFFERS = 'open_to_offers',
-  NOT_AVAILABLE = 'not_available'
+  NOT_AVAILABLE = 'not_available',
 }
 
 export class EducationDto {
   @ApiProperty({
     description: 'Institution name',
-    example: 'University of California, Berkeley'
+    example: 'University of California, Berkeley',
   })
   @IsString()
   @MaxLength(200)
@@ -52,7 +52,7 @@ export class EducationDto {
 
   @ApiProperty({
     description: 'Degree or certification name',
-    example: 'Bachelor of Science in Computer Science'
+    example: 'Bachelor of Science in Computer Science',
   })
   @IsString()
   @MaxLength(200)
@@ -60,7 +60,7 @@ export class EducationDto {
 
   @ApiProperty({
     description: 'Field of study',
-    example: 'Computer Science'
+    example: 'Computer Science',
   })
   @IsString()
   @MaxLength(100)
@@ -69,14 +69,14 @@ export class EducationDto {
   @ApiProperty({
     description: 'Education level',
     enum: EducationLevel,
-    example: EducationLevel.BACHELOR
+    example: EducationLevel.BACHELOR,
   })
   @IsEnum(EducationLevel)
   level: EducationLevel;
 
   @ApiPropertyOptional({
     description: 'Start date of education',
-    example: '2020-09-01'
+    example: '2020-09-01',
   })
   @IsOptional()
   @IsDateString()
@@ -84,7 +84,7 @@ export class EducationDto {
 
   @ApiPropertyOptional({
     description: 'End date of education (null if ongoing)',
-    example: '2024-05-15'
+    example: '2024-05-15',
   })
   @IsOptional()
   @IsDateString()
@@ -94,7 +94,7 @@ export class EducationDto {
     description: 'GPA or equivalent score',
     example: 3.8,
     minimum: 0,
-    maximum: 4.0
+    maximum: 4.0,
   })
   @IsOptional()
   @IsNumber()
@@ -104,7 +104,7 @@ export class EducationDto {
 
   @ApiPropertyOptional({
     description: 'Additional description or achievements',
-    example: 'Magna Cum Laude, Dean\'s List 2022-2024'
+    example: "Magna Cum Laude, Dean's List 2022-2024",
   })
   @IsOptional()
   @IsString()
@@ -115,7 +115,7 @@ export class EducationDto {
 export class ExperienceDto {
   @ApiProperty({
     description: 'Company name',
-    example: 'Google Inc.'
+    example: 'Google Inc.',
   })
   @IsString()
   @MaxLength(200)
@@ -123,7 +123,7 @@ export class ExperienceDto {
 
   @ApiProperty({
     description: 'Job title',
-    example: 'Software Engineer Intern'
+    example: 'Software Engineer Intern',
   })
   @IsString()
   @MaxLength(200)
@@ -132,14 +132,14 @@ export class ExperienceDto {
   @ApiProperty({
     description: 'Experience level',
     enum: ExperienceLevel,
-    example: ExperienceLevel.ENTRY
+    example: ExperienceLevel.ENTRY,
   })
   @IsEnum(ExperienceLevel)
   level: ExperienceLevel;
 
   @ApiPropertyOptional({
     description: 'Start date of employment',
-    example: '2023-06-01'
+    example: '2023-06-01',
   })
   @IsOptional()
   @IsDateString()
@@ -147,7 +147,7 @@ export class ExperienceDto {
 
   @ApiPropertyOptional({
     description: 'End date of employment (null if current)',
-    example: '2023-08-31'
+    example: '2023-08-31',
   })
   @IsOptional()
   @IsDateString()
@@ -155,7 +155,8 @@ export class ExperienceDto {
 
   @ApiPropertyOptional({
     description: 'Job description and achievements',
-    example: 'Developed microservices using Go and Python, improved system performance by 25%'
+    example:
+      'Developed microservices using Go and Python, improved system performance by 25%',
   })
   @IsOptional()
   @IsString()
@@ -164,7 +165,7 @@ export class ExperienceDto {
 
   @ApiPropertyOptional({
     description: 'Technologies and skills used',
-    example: ['JavaScript', 'React', 'Node.js', 'MongoDB']
+    example: ['JavaScript', 'React', 'Node.js', 'MongoDB'],
   })
   @IsOptional()
   @IsArray()
@@ -176,7 +177,7 @@ export class ExperienceDto {
 export class ProjectDto {
   @ApiProperty({
     description: 'Project name',
-    example: 'AI-Powered Job Matching Platform'
+    example: 'AI-Powered Job Matching Platform',
   })
   @IsString()
   @MaxLength(200)
@@ -184,7 +185,8 @@ export class ProjectDto {
 
   @ApiPropertyOptional({
     description: 'Project description',
-    example: 'A full-stack web application that uses machine learning to match students with relevant job opportunities'
+    example:
+      'A full-stack web application that uses machine learning to match students with relevant job opportunities',
   })
   @IsOptional()
   @IsString()
@@ -193,7 +195,7 @@ export class ProjectDto {
 
   @ApiPropertyOptional({
     description: 'Technologies used in the project',
-    example: ['React', 'Node.js', 'Python', 'TensorFlow', 'PostgreSQL']
+    example: ['React', 'Node.js', 'Python', 'TensorFlow', 'PostgreSQL'],
   })
   @IsOptional()
   @IsArray()
@@ -203,7 +205,7 @@ export class ProjectDto {
 
   @ApiPropertyOptional({
     description: 'Project repository URL',
-    example: 'https://github.com/username/ai-job-matching'
+    example: 'https://github.com/username/ai-job-matching',
   })
   @IsOptional()
   @IsUrl()
@@ -211,7 +213,7 @@ export class ProjectDto {
 
   @ApiPropertyOptional({
     description: 'Live demo URL',
-    example: 'https://ai-job-matching.vercel.app'
+    example: 'https://ai-job-matching.vercel.app',
   })
   @IsOptional()
   @IsUrl()
@@ -219,7 +221,7 @@ export class ProjectDto {
 
   @ApiPropertyOptional({
     description: 'Project start date',
-    example: '2024-01-15'
+    example: '2024-01-15',
   })
   @IsOptional()
   @IsDateString()
@@ -227,7 +229,7 @@ export class ProjectDto {
 
   @ApiPropertyOptional({
     description: 'Project completion date',
-    example: '2024-03-30'
+    example: '2024-03-30',
   })
   @IsOptional()
   @IsDateString()
@@ -236,8 +238,8 @@ export class ProjectDto {
 
 export class CreateStudentProfileDto {
   @ApiProperty({
-    description: 'Student\'s first name',
-    example: 'John'
+    description: "Student's first name",
+    example: 'John',
   })
   @IsString()
   @MinLength(2)
@@ -245,8 +247,8 @@ export class CreateStudentProfileDto {
   first_name: string;
 
   @ApiProperty({
-    description: 'Student\'s last name',
-    example: 'Doe'
+    description: "Student's last name",
+    example: 'Doe',
   })
   @IsString()
   @MinLength(2)
@@ -254,15 +256,15 @@ export class CreateStudentProfileDto {
   last_name: string;
 
   @ApiProperty({
-    description: 'Student\'s email address',
-    example: 'john.doe@university.edu'
+    description: "Student's email address",
+    example: 'john.doe@university.edu',
   })
   @IsEmail()
   email: string;
 
   @ApiPropertyOptional({
-    description: 'Student\'s phone number',
-    example: '+1-555-123-4567'
+    description: "Student's phone number",
+    example: '+1-555-123-4567',
   })
   @IsOptional()
   @IsString()
@@ -270,8 +272,8 @@ export class CreateStudentProfileDto {
   phone?: string;
 
   @ApiPropertyOptional({
-    description: 'Student\'s location (city, state/country)',
-    example: 'San Francisco, CA'
+    description: "Student's location (city, state/country)",
+    example: 'San Francisco, CA',
   })
   @IsOptional()
   @IsString()
@@ -280,7 +282,7 @@ export class CreateStudentProfileDto {
 
   @ApiPropertyOptional({
     description: 'Professional headline or title',
-    example: 'Computer Science Student | Full-Stack Developer | AI Enthusiast'
+    example: 'Computer Science Student | Full-Stack Developer | AI Enthusiast',
   })
   @IsOptional()
   @IsString()
@@ -289,7 +291,8 @@ export class CreateStudentProfileDto {
 
   @ApiPropertyOptional({
     description: 'Professional summary or bio',
-    example: 'Passionate computer science student with 2+ years of experience in full-stack development. Specialized in React, Node.js, and machine learning applications.'
+    example:
+      'Passionate computer science student with 2+ years of experience in full-stack development. Specialized in React, Node.js, and machine learning applications.',
   })
   @IsOptional()
   @IsString()
@@ -298,7 +301,7 @@ export class CreateStudentProfileDto {
 
   @ApiPropertyOptional({
     description: 'Portfolio website URL',
-    example: 'https://johndoe.dev'
+    example: 'https://johndoe.dev',
   })
   @IsOptional()
   @IsUrl()
@@ -306,7 +309,7 @@ export class CreateStudentProfileDto {
 
   @ApiPropertyOptional({
     description: 'LinkedIn profile URL',
-    example: 'https://linkedin.com/in/johndoe'
+    example: 'https://linkedin.com/in/johndoe',
   })
   @IsOptional()
   @IsUrl()
@@ -314,7 +317,7 @@ export class CreateStudentProfileDto {
 
   @ApiPropertyOptional({
     description: 'GitHub profile URL',
-    example: 'https://github.com/johndoe'
+    example: 'https://github.com/johndoe',
   })
   @IsOptional()
   @IsUrl()
@@ -322,7 +325,7 @@ export class CreateStudentProfileDto {
 
   @ApiPropertyOptional({
     description: 'Resume file URL or path',
-    example: 'https://storage.example.com/resumes/john-doe-resume.pdf'
+    example: 'https://storage.example.com/resumes/john-doe-resume.pdf',
   })
   @IsOptional()
   @IsUrl()
@@ -331,7 +334,7 @@ export class CreateStudentProfileDto {
   @ApiPropertyOptional({
     description: 'Current availability status',
     enum: AvailabilityStatus,
-    example: AvailabilityStatus.AVAILABLE
+    example: AvailabilityStatus.AVAILABLE,
   })
   @IsOptional()
   @IsEnum(AvailabilityStatus)
@@ -339,7 +342,7 @@ export class CreateStudentProfileDto {
 
   @ApiPropertyOptional({
     description: 'Desired job types',
-    example: ['full-time', 'internship', 'part-time']
+    example: ['full-time', 'internship', 'part-time'],
   })
   @IsOptional()
   @IsArray()
@@ -349,7 +352,15 @@ export class CreateStudentProfileDto {
 
   @ApiPropertyOptional({
     description: 'Technical skills and competencies',
-    example: ['JavaScript', 'Python', 'React', 'Node.js', 'PostgreSQL', 'Docker', 'AWS']
+    example: [
+      'JavaScript',
+      'Python',
+      'React',
+      'Node.js',
+      'PostgreSQL',
+      'Docker',
+      'AWS',
+    ],
   })
   @IsOptional()
   @IsArray()
@@ -359,7 +370,7 @@ export class CreateStudentProfileDto {
 
   @ApiPropertyOptional({
     description: 'Languages spoken',
-    example: ['English (Native)', 'Spanish (Conversational)', 'French (Basic)']
+    example: ['English (Native)', 'Spanish (Conversational)', 'French (Basic)'],
   })
   @IsOptional()
   @IsArray()
@@ -370,15 +381,17 @@ export class CreateStudentProfileDto {
   @ApiPropertyOptional({
     description: 'Education history',
     type: [EducationDto],
-    example: [{
-      institution: 'University of California, Berkeley',
-      degree: 'Bachelor of Science in Computer Science',
-      field_of_study: 'Computer Science',
-      level: 'bachelor',
-      start_date: '2020-09-01',
-      end_date: '2024-05-15',
-      gpa: 3.8
-    }]
+    example: [
+      {
+        institution: 'University of California, Berkeley',
+        degree: 'Bachelor of Science in Computer Science',
+        field_of_study: 'Computer Science',
+        level: 'bachelor',
+        start_date: '2020-09-01',
+        end_date: '2024-05-15',
+        gpa: 3.8,
+      },
+    ],
   })
   @IsOptional()
   @IsArray()
@@ -387,15 +400,17 @@ export class CreateStudentProfileDto {
   @ApiPropertyOptional({
     description: 'Work experience history',
     type: [ExperienceDto],
-    example: [{
-      company: 'Google Inc.',
-      title: 'Software Engineer Intern',
-      level: 'entry',
-      start_date: '2023-06-01',
-      end_date: '2023-08-31',
-      description: 'Developed microservices using Go and Python',
-      technologies: ['Go', 'Python', 'Kubernetes']
-    }]
+    example: [
+      {
+        company: 'Google Inc.',
+        title: 'Software Engineer Intern',
+        level: 'entry',
+        start_date: '2023-06-01',
+        end_date: '2023-08-31',
+        description: 'Developed microservices using Go and Python',
+        technologies: ['Go', 'Python', 'Kubernetes'],
+      },
+    ],
   })
   @IsOptional()
   @IsArray()
@@ -404,13 +419,16 @@ export class CreateStudentProfileDto {
   @ApiPropertyOptional({
     description: 'Personal projects',
     type: [ProjectDto],
-    example: [{
-      name: 'AI-Powered Job Matching Platform',
-      description: 'A full-stack web application that uses machine learning to match students with relevant job opportunities',
-      technologies: ['React', 'Node.js', 'Python', 'TensorFlow'],
-      repository_url: 'https://github.com/username/ai-job-matching',
-      demo_url: 'https://ai-job-matching.vercel.app'
-    }]
+    example: [
+      {
+        name: 'AI-Powered Job Matching Platform',
+        description:
+          'A full-stack web application that uses machine learning to match students with relevant job opportunities',
+        technologies: ['React', 'Node.js', 'Python', 'TensorFlow'],
+        repository_url: 'https://github.com/username/ai-job-matching',
+        demo_url: 'https://ai-job-matching.vercel.app',
+      },
+    ],
   })
   @IsOptional()
   @IsArray()
@@ -419,8 +437,8 @@ export class CreateStudentProfileDto {
 
 export class UpdateStudentProfileDto {
   @ApiPropertyOptional({
-    description: 'Student\'s first name',
-    example: 'John'
+    description: "Student's first name",
+    example: 'John',
   })
   @IsOptional()
   @IsString()
@@ -429,8 +447,8 @@ export class UpdateStudentProfileDto {
   first_name?: string;
 
   @ApiPropertyOptional({
-    description: 'Student\'s last name',
-    example: 'Doe'
+    description: "Student's last name",
+    example: 'Doe',
   })
   @IsOptional()
   @IsString()
@@ -439,8 +457,8 @@ export class UpdateStudentProfileDto {
   last_name?: string;
 
   @ApiPropertyOptional({
-    description: 'Student\'s phone number',
-    example: '+1-555-123-4567'
+    description: "Student's phone number",
+    example: '+1-555-123-4567',
   })
   @IsOptional()
   @IsString()
@@ -448,8 +466,8 @@ export class UpdateStudentProfileDto {
   phone?: string;
 
   @ApiPropertyOptional({
-    description: 'Student\'s location',
-    example: 'San Francisco, CA'
+    description: "Student's location",
+    example: 'San Francisco, CA',
   })
   @IsOptional()
   @IsString()
@@ -458,7 +476,7 @@ export class UpdateStudentProfileDto {
 
   @ApiPropertyOptional({
     description: 'Professional headline',
-    example: 'Senior Computer Science Student | Full-Stack Developer'
+    example: 'Senior Computer Science Student | Full-Stack Developer',
   })
   @IsOptional()
   @IsString()
@@ -467,7 +485,8 @@ export class UpdateStudentProfileDto {
 
   @ApiPropertyOptional({
     description: 'Professional summary',
-    example: 'Experienced computer science student with 3+ years in full-stack development'
+    example:
+      'Experienced computer science student with 3+ years in full-stack development',
   })
   @IsOptional()
   @IsString()
@@ -476,7 +495,7 @@ export class UpdateStudentProfileDto {
 
   @ApiPropertyOptional({
     description: 'Portfolio website URL',
-    example: 'https://johndoe.dev'
+    example: 'https://johndoe.dev',
   })
   @IsOptional()
   @IsUrl()
@@ -484,7 +503,7 @@ export class UpdateStudentProfileDto {
 
   @ApiPropertyOptional({
     description: 'LinkedIn profile URL',
-    example: 'https://linkedin.com/in/johndoe'
+    example: 'https://linkedin.com/in/johndoe',
   })
   @IsOptional()
   @IsUrl()
@@ -492,7 +511,7 @@ export class UpdateStudentProfileDto {
 
   @ApiPropertyOptional({
     description: 'GitHub profile URL',
-    example: 'https://github.com/johndoe'
+    example: 'https://github.com/johndoe',
   })
   @IsOptional()
   @IsUrl()
@@ -500,7 +519,7 @@ export class UpdateStudentProfileDto {
 
   @ApiPropertyOptional({
     description: 'Resume file URL',
-    example: 'https://storage.example.com/resumes/john-doe-resume-v2.pdf'
+    example: 'https://storage.example.com/resumes/john-doe-resume-v2.pdf',
   })
   @IsOptional()
   @IsUrl()
@@ -509,7 +528,7 @@ export class UpdateStudentProfileDto {
   @ApiPropertyOptional({
     description: 'Availability status',
     enum: AvailabilityStatus,
-    example: AvailabilityStatus.OPEN_TO_OFFERS
+    example: AvailabilityStatus.OPEN_TO_OFFERS,
   })
   @IsOptional()
   @IsEnum(AvailabilityStatus)
@@ -517,7 +536,7 @@ export class UpdateStudentProfileDto {
 
   @ApiPropertyOptional({
     description: 'Desired job types',
-    example: ['full-time', 'remote']
+    example: ['full-time', 'remote'],
   })
   @IsOptional()
   @IsArray()
@@ -527,7 +546,7 @@ export class UpdateStudentProfileDto {
 
   @ApiPropertyOptional({
     description: 'Technical skills',
-    example: ['JavaScript', 'Python', 'React', 'AWS']
+    example: ['JavaScript', 'Python', 'React', 'AWS'],
   })
   @IsOptional()
   @IsArray()
@@ -537,7 +556,7 @@ export class UpdateStudentProfileDto {
 
   @ApiPropertyOptional({
     description: 'Languages spoken',
-    example: ['English (Native)', 'Spanish (Fluent)']
+    example: ['English (Native)', 'Spanish (Fluent)'],
   })
   @IsOptional()
   @IsArray()
@@ -547,7 +566,7 @@ export class UpdateStudentProfileDto {
 
   @ApiPropertyOptional({
     description: 'Education history',
-    type: [EducationDto]
+    type: [EducationDto],
   })
   @IsOptional()
   @IsArray()
@@ -555,7 +574,7 @@ export class UpdateStudentProfileDto {
 
   @ApiPropertyOptional({
     description: 'Work experience history',
-    type: [ExperienceDto]
+    type: [ExperienceDto],
   })
   @IsOptional()
   @IsArray()
@@ -563,7 +582,7 @@ export class UpdateStudentProfileDto {
 
   @ApiPropertyOptional({
     description: 'Personal projects',
-    type: [ProjectDto]
+    type: [ProjectDto],
   })
   @IsOptional()
   @IsArray()
@@ -573,7 +592,7 @@ export class UpdateStudentProfileDto {
 export class StudentProfileSearchDto {
   @ApiPropertyOptional({
     description: 'Search by name (first or last)',
-    example: 'John'
+    example: 'John',
   })
   @IsOptional()
   @IsString()
@@ -582,7 +601,7 @@ export class StudentProfileSearchDto {
 
   @ApiPropertyOptional({
     description: 'Filter by skills (comma-separated)',
-    example: 'JavaScript,React,Node.js'
+    example: 'JavaScript,React,Node.js',
   })
   @IsOptional()
   @IsString()
@@ -590,7 +609,7 @@ export class StudentProfileSearchDto {
 
   @ApiPropertyOptional({
     description: 'Filter by location',
-    example: 'San Francisco'
+    example: 'San Francisco',
   })
   @IsOptional()
   @IsString()
@@ -600,7 +619,7 @@ export class StudentProfileSearchDto {
   @ApiPropertyOptional({
     description: 'Filter by availability status',
     enum: AvailabilityStatus,
-    example: AvailabilityStatus.AVAILABLE
+    example: AvailabilityStatus.AVAILABLE,
   })
   @IsOptional()
   @IsEnum(AvailabilityStatus)
@@ -609,7 +628,7 @@ export class StudentProfileSearchDto {
   @ApiPropertyOptional({
     description: 'Filter by education level',
     enum: EducationLevel,
-    example: EducationLevel.BACHELOR
+    example: EducationLevel.BACHELOR,
   })
   @IsOptional()
   @IsEnum(EducationLevel)
@@ -618,7 +637,7 @@ export class StudentProfileSearchDto {
   @ApiPropertyOptional({
     description: 'Filter by experience level',
     enum: ExperienceLevel,
-    example: ExperienceLevel.JUNIOR
+    example: ExperienceLevel.JUNIOR,
   })
   @IsOptional()
   @IsEnum(ExperienceLevel)
@@ -627,7 +646,7 @@ export class StudentProfileSearchDto {
   @ApiPropertyOptional({
     description: 'Page number for pagination',
     example: 1,
-    minimum: 1
+    minimum: 1,
   })
   @IsOptional()
   @IsNumber()
@@ -638,7 +657,7 @@ export class StudentProfileSearchDto {
     description: 'Number of results per page',
     example: 20,
     minimum: 1,
-    maximum: 100
+    maximum: 100,
   })
   @IsOptional()
   @IsNumber()
@@ -649,7 +668,7 @@ export class StudentProfileSearchDto {
   @ApiPropertyOptional({
     description: 'Sort field',
     example: 'created_at',
-    enum: ['created_at', 'updated_at', 'first_name', 'last_name']
+    enum: ['created_at', 'updated_at', 'first_name', 'last_name'],
   })
   @IsOptional()
   @IsString()
@@ -658,7 +677,7 @@ export class StudentProfileSearchDto {
   @ApiPropertyOptional({
     description: 'Sort order',
     example: 'desc',
-    enum: ['asc', 'desc']
+    enum: ['asc', 'desc'],
   })
   @IsOptional()
   @IsEnum(['asc', 'desc'])
@@ -668,139 +687,140 @@ export class StudentProfileSearchDto {
 export class StudentProfileResponseDto {
   @ApiProperty({
     description: 'Unique profile identifier',
-    example: '550e8400-e29b-41d4-a716-446655440000'
+    example: '550e8400-e29b-41d4-a716-446655440000',
   })
   id: string;
 
   @ApiProperty({
-    description: 'Student\'s first name',
-    example: 'John'
+    description: "Student's first name",
+    example: 'John',
   })
   first_name: string;
 
   @ApiProperty({
-    description: 'Student\'s last name',
-    example: 'Doe'
+    description: "Student's last name",
+    example: 'Doe',
   })
   last_name: string;
 
   @ApiProperty({
-    description: 'Student\'s email address',
-    example: 'john.doe@university.edu'
+    description: "Student's email address",
+    example: 'john.doe@university.edu',
   })
   email: string;
 
   @ApiProperty({
-    description: 'Student\'s phone number',
+    description: "Student's phone number",
     example: '+1-555-123-4567',
-    nullable: true
+    nullable: true,
   })
   phone: string | null;
 
   @ApiProperty({
-    description: 'Student\'s location',
+    description: "Student's location",
     example: 'San Francisco, CA',
-    nullable: true
+    nullable: true,
   })
   location: string | null;
 
   @ApiProperty({
     description: 'Professional headline',
     example: 'Computer Science Student | Full-Stack Developer',
-    nullable: true
+    nullable: true,
   })
   headline: string | null;
 
   @ApiProperty({
     description: 'Professional summary',
-    example: 'Passionate computer science student with experience in full-stack development',
-    nullable: true
+    example:
+      'Passionate computer science student with experience in full-stack development',
+    nullable: true,
   })
   summary: string | null;
 
   @ApiProperty({
     description: 'Portfolio website URL',
     example: 'https://johndoe.dev',
-    nullable: true
+    nullable: true,
   })
   portfolio_url: string | null;
 
   @ApiProperty({
     description: 'LinkedIn profile URL',
     example: 'https://linkedin.com/in/johndoe',
-    nullable: true
+    nullable: true,
   })
   linkedin_url: string | null;
 
   @ApiProperty({
     description: 'GitHub profile URL',
     example: 'https://github.com/johndoe',
-    nullable: true
+    nullable: true,
   })
   github_url: string | null;
 
   @ApiProperty({
     description: 'Resume file URL',
     example: 'https://storage.example.com/resumes/john-doe-resume.pdf',
-    nullable: true
+    nullable: true,
   })
   resume_url: string | null;
 
   @ApiProperty({
     description: 'Current availability status',
     enum: AvailabilityStatus,
-    example: AvailabilityStatus.AVAILABLE
+    example: AvailabilityStatus.AVAILABLE,
   })
   availability_status: AvailabilityStatus;
 
   @ApiProperty({
     description: 'Desired job types',
     example: ['full-time', 'internship'],
-    type: [String]
+    type: [String],
   })
   desired_job_types: string[];
 
   @ApiProperty({
     description: 'Technical skills',
     example: ['JavaScript', 'Python', 'React', 'Node.js'],
-    type: [String]
+    type: [String],
   })
   skills: string[];
 
   @ApiProperty({
     description: 'Languages spoken',
     example: ['English (Native)', 'Spanish (Conversational)'],
-    type: [String]
+    type: [String],
   })
   languages: string[];
 
   @ApiProperty({
     description: 'Education history',
-    type: [EducationDto]
+    type: [EducationDto],
   })
   education: EducationDto[];
 
   @ApiProperty({
     description: 'Work experience history',
-    type: [ExperienceDto]
+    type: [ExperienceDto],
   })
   experience: ExperienceDto[];
 
   @ApiProperty({
     description: 'Personal projects',
-    type: [ProjectDto]
+    type: [ProjectDto],
   })
   projects: ProjectDto[];
 
   @ApiProperty({
     description: 'Profile creation timestamp',
-    example: '2024-01-15T10:30:00Z'
+    example: '2024-01-15T10:30:00Z',
   })
   created_at: Date;
 
   @ApiProperty({
     description: 'Profile last update timestamp',
-    example: '2024-03-20T14:45:00Z'
+    example: '2024-03-20T14:45:00Z',
   })
   updated_at: Date;
 }

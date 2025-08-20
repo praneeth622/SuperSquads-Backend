@@ -16,7 +16,12 @@ import { ConfigService } from '@nestjs/config';
 import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { CurrentUser } from './decorators/current-user.decorator';
-import { User, UserStatus, VerificationStatus, UserRole } from '../entities/user.entity';
+import {
+  User,
+  UserStatus,
+  VerificationStatus,
+  UserRole,
+} from '../entities/user.entity';
 import { College } from '../entities/college.entity';
 import {
   SupabaseWebhookDto,
@@ -44,7 +49,7 @@ export class AuthController {
   async handleSupabaseWebhook(@Body() payload: SupabaseWebhookDto) {
     // Verify webhook signature in production
     // TODO: Implement HMAC verification
-    
+
     const { type, record } = payload;
     const emailDomain = record.email.split('@')[1];
 

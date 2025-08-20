@@ -3,7 +3,9 @@ import { ConfigService } from '@nestjs/config';
 import { redisStore } from 'cache-manager-ioredis-yet';
 import { Environment } from './env.schema';
 
-export const getRedisConfig = async (configService: ConfigService<Environment>): Promise<CacheModuleOptions> => {
+export const getRedisConfig = async (
+  configService: ConfigService<Environment>,
+): Promise<CacheModuleOptions> => {
   return {
     store: await redisStore({
       url: configService.get('REDIS_URL'),

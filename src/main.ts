@@ -22,9 +22,10 @@ async function bootstrap() {
 
   // CORS configuration
   app.enableCors({
-    origin: process.env.NODE_ENV === 'production' 
-      ? ['https://yourdomain.com'] // Add your frontend domains
-      : true,
+    origin:
+      process.env.NODE_ENV === 'production'
+        ? ['https://yourdomain.com'] // Add your frontend domains
+        : true,
     credentials: true,
   });
 
@@ -44,14 +45,16 @@ async function bootstrap() {
   if (configService.get('ENABLE_SWAGGER')) {
     const config = new DocumentBuilder()
       .setTitle('Super Squads API')
-      .setDescription('A gated marketplace for Tier-1 students and verified recruiters')
+      .setDescription(
+        'A gated marketplace for Tier-1 students and verified recruiters',
+      )
       .setVersion('1.0')
       .addBearerAuth()
       .build();
-    
+
     const document = SwaggerModule.createDocument(app, config);
     SwaggerModule.setup('api/docs', app, document);
-    
+
     logger.log('Swagger documentation available at /api/docs');
   }
 

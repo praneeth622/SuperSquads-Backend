@@ -30,14 +30,21 @@ export const VerifyCollegeCallbackSchema = z.object({
   token: z.string().min(1),
 });
 
-export type VerifyCollegeCallbackDto = z.infer<typeof VerifyCollegeCallbackSchema>;
+export type VerifyCollegeCallbackDto = z.infer<
+  typeof VerifyCollegeCallbackSchema
+>;
 
 // User response DTO
 export const UserResponseSchema = z.object({
   id: z.string().uuid(),
   email: z.string().email(),
   role: z.enum(['student', 'recruiter', 'admin']),
-  status: z.enum(['pending_verification', 'active', 'suspended', 'deactivated']),
+  status: z.enum([
+    'pending_verification',
+    'active',
+    'suspended',
+    'deactivated',
+  ]),
   verification_status: z.enum(['none', 'pending', 'verified', 'rejected']),
   verified_college_affiliation: z.boolean(),
   college_email: z.string().email().nullable(),

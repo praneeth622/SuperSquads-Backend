@@ -7,26 +7,83 @@ const CompanyStatusEnum = z.enum(['pending', 'verified', 'rejected']);
 
 // Create Company Schema
 const CreateCompanySchema = z.object({
-  name: z.string().min(1, 'Company name is required').max(255, 'Company name too long'),
-  website: z.string().url('Invalid website URL').max(500, 'Website URL too long').optional(),
-  domain: z.string().regex(/^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, 'Invalid domain format').max(255, 'Domain too long').optional(),
+  name: z
+    .string()
+    .min(1, 'Company name is required')
+    .max(255, 'Company name too long'),
+  website: z
+    .string()
+    .url('Invalid website URL')
+    .max(500, 'Website URL too long')
+    .optional(),
+  domain: z
+    .string()
+    .regex(/^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, 'Invalid domain format')
+    .max(255, 'Domain too long')
+    .optional(),
   description: z.string().max(2000, 'Description too long').optional(),
-  logo_url: z.string().url('Invalid logo URL').max(255, 'Logo URL too long').optional(),
+  logo_url: z
+    .string()
+    .url('Invalid logo URL')
+    .max(255, 'Logo URL too long')
+    .optional(),
   industry: z.string().max(100, 'Industry name too long').optional(),
-  company_size: z.enum(['1-10', '11-50', '51-200', '201-500', '501-1000', '1001-5000', '5000+']).optional(),
-  headquarters: z.string().max(255, 'Headquarters location too long').optional(),
+  company_size: z
+    .enum([
+      '1-10',
+      '11-50',
+      '51-200',
+      '201-500',
+      '501-1000',
+      '1001-5000',
+      '5000+',
+    ])
+    .optional(),
+  headquarters: z
+    .string()
+    .max(255, 'Headquarters location too long')
+    .optional(),
 });
 
 // Update Company Schema
 const UpdateCompanySchema = z.object({
-  name: z.string().min(1, 'Company name is required').max(255, 'Company name too long').optional(),
-  website: z.string().url('Invalid website URL').max(500, 'Website URL too long').optional(),
-  domain: z.string().regex(/^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, 'Invalid domain format').max(255, 'Domain too long').optional(),
+  name: z
+    .string()
+    .min(1, 'Company name is required')
+    .max(255, 'Company name too long')
+    .optional(),
+  website: z
+    .string()
+    .url('Invalid website URL')
+    .max(500, 'Website URL too long')
+    .optional(),
+  domain: z
+    .string()
+    .regex(/^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, 'Invalid domain format')
+    .max(255, 'Domain too long')
+    .optional(),
   description: z.string().max(2000, 'Description too long').optional(),
-  logo_url: z.string().url('Invalid logo URL').max(255, 'Logo URL too long').optional(),
+  logo_url: z
+    .string()
+    .url('Invalid logo URL')
+    .max(255, 'Logo URL too long')
+    .optional(),
   industry: z.string().max(100, 'Industry name too long').optional(),
-  company_size: z.enum(['1-10', '11-50', '51-200', '201-500', '501-1000', '1001-5000', '5000+']).optional(),
-  headquarters: z.string().max(255, 'Headquarters location too long').optional(),
+  company_size: z
+    .enum([
+      '1-10',
+      '11-50',
+      '51-200',
+      '201-500',
+      '501-1000',
+      '1001-5000',
+      '5000+',
+    ])
+    .optional(),
+  headquarters: z
+    .string()
+    .max(255, 'Headquarters location too long')
+    .optional(),
   is_verified: z.boolean().optional(),
 });
 
@@ -34,16 +91,26 @@ const UpdateCompanySchema = z.object({
 const CompanySearchSchema = z.object({
   // Search
   search: z.string().max(255, 'Search query too long').optional(),
-  
+
   // Filters
   industry: z.string().max(100, 'Industry filter too long').optional(),
-  company_size: z.enum(['1-10', '11-50', '51-200', '201-500', '501-1000', '1001-5000', '5000+']).optional(),
+  company_size: z
+    .enum([
+      '1-10',
+      '11-50',
+      '51-200',
+      '201-500',
+      '501-1000',
+      '1001-5000',
+      '5000+',
+    ])
+    .optional(),
   is_verified: z.boolean().optional(),
-  
+
   // Pagination
   page: z.number().int().positive().default(1),
   limit: z.number().int().positive().max(100).default(20),
-  
+
   // Sorting
   sort_by: z.enum(['name', 'created_at', 'updated_at']).default('name'),
   sort_order: z.enum(['asc', 'desc']).default('asc'),
@@ -61,12 +128,12 @@ const CompanyResponseSchema = z.object({
   company_size: z.string().nullable(),
   headquarters: z.string().nullable(),
   is_verified: z.boolean(),
-  
+
   // Aggregated data
   total_jobs: z.number().optional(),
   active_jobs: z.number().optional(),
   total_applications: z.number().optional(),
-  
+
   // Timestamps
   created_at: z.string().datetime(),
   updated_at: z.string().datetime(),
@@ -86,10 +153,12 @@ const CompanyStatsSchema = z.object({
   total_companies: z.number(),
   verified_companies: z.number(),
   pending_verification: z.number(),
-  top_industries: z.array(z.object({
-    industry: z.string(),
-    count: z.number(),
-  })),
+  top_industries: z.array(
+    z.object({
+      industry: z.string(),
+      count: z.number(),
+    }),
+  ),
   by_company_size: z.record(z.string(), z.number()),
 });
 
@@ -119,7 +188,8 @@ export class CreateCompanyDto extends createZodDto(CreateCompanySchema) {
 
   @ApiPropertyOptional({
     description: 'Company description',
-    example: 'We are a leading technology company focused on innovative software solutions for enterprises.',
+    example:
+      'We are a leading technology company focused on innovative software solutions for enterprises.',
     maxLength: 2000,
   })
   description?: string;
@@ -141,10 +211,25 @@ export class CreateCompanyDto extends createZodDto(CreateCompanySchema) {
 
   @ApiPropertyOptional({
     description: 'Company size range',
-    enum: ['1-10', '11-50', '51-200', '201-500', '501-1000', '1001-5000', '5000+'],
+    enum: [
+      '1-10',
+      '11-50',
+      '51-200',
+      '201-500',
+      '501-1000',
+      '1001-5000',
+      '5000+',
+    ],
     example: '51-200',
   })
-  company_size?: '1-10' | '11-50' | '51-200' | '201-500' | '501-1000' | '1001-5000' | '5000+';
+  company_size?:
+    | '1-10'
+    | '11-50'
+    | '51-200'
+    | '201-500'
+    | '501-1000'
+    | '1001-5000'
+    | '5000+';
 
   @ApiPropertyOptional({
     description: 'Company headquarters location',
@@ -179,7 +264,8 @@ export class UpdateCompanyDto extends createZodDto(UpdateCompanySchema) {
 
   @ApiPropertyOptional({
     description: 'Company description',
-    example: 'We are a leading technology company focused on innovative software solutions.',
+    example:
+      'We are a leading technology company focused on innovative software solutions.',
     maxLength: 2000,
   })
   description?: string;
@@ -201,10 +287,25 @@ export class UpdateCompanyDto extends createZodDto(UpdateCompanySchema) {
 
   @ApiPropertyOptional({
     description: 'Company size range',
-    enum: ['1-10', '11-50', '51-200', '201-500', '501-1000', '1001-5000', '5000+'],
+    enum: [
+      '1-10',
+      '11-50',
+      '51-200',
+      '201-500',
+      '501-1000',
+      '1001-5000',
+      '5000+',
+    ],
     example: '201-500',
   })
-  company_size?: '1-10' | '11-50' | '51-200' | '201-500' | '501-1000' | '1001-5000' | '5000+';
+  company_size?:
+    | '1-10'
+    | '11-50'
+    | '51-200'
+    | '201-500'
+    | '501-1000'
+    | '1001-5000'
+    | '5000+';
 
   @ApiPropertyOptional({
     description: 'Company headquarters location',
@@ -237,10 +338,25 @@ export class CompanySearchDto extends createZodDto(CompanySearchSchema) {
 
   @ApiPropertyOptional({
     description: 'Filter by company size',
-    enum: ['1-10', '11-50', '51-200', '201-500', '501-1000', '1001-5000', '5000+'],
+    enum: [
+      '1-10',
+      '11-50',
+      '51-200',
+      '201-500',
+      '501-1000',
+      '1001-5000',
+      '5000+',
+    ],
     example: '51-200',
   })
-  company_size?: '1-10' | '11-50' | '51-200' | '201-500' | '501-1000' | '1001-5000' | '5000+';
+  company_size?:
+    | '1-10'
+    | '11-50'
+    | '51-200'
+    | '201-500'
+    | '501-1000'
+    | '1001-5000'
+    | '5000+';
 
   @ApiPropertyOptional({
     description: 'Filter by verification status',
@@ -433,7 +549,7 @@ export class CompanyStatsDto {
     example: [
       { industry: 'Technology', count: 45 },
       { industry: 'Finance', count: 30 },
-      { industry: 'Healthcare', count: 20 }
+      { industry: 'Healthcare', count: 20 },
     ],
   })
   top_industries: Array<{ industry: string; count: number }>;
@@ -447,7 +563,7 @@ export class CompanyStatsDto {
       '201-500': 25,
       '501-1000': 15,
       '1001-5000': 10,
-      '5000+': 5
+      '5000+': 5,
     },
   })
   by_company_size: Record<string, number>;
@@ -458,5 +574,7 @@ export type CreateCompanyDtoType = z.infer<typeof CreateCompanySchema>;
 export type UpdateCompanyDtoType = z.infer<typeof UpdateCompanySchema>;
 export type CompanySearchDtoType = z.infer<typeof CompanySearchSchema>;
 export type CompanyResponseDtoType = z.infer<typeof CompanyResponseSchema>;
-export type CompanyListResponseDtoType = z.infer<typeof CompanyListResponseSchema>;
+export type CompanyListResponseDtoType = z.infer<
+  typeof CompanyListResponseSchema
+>;
 export type CompanyStatsDtoType = z.infer<typeof CompanyStatsSchema>;

@@ -7,13 +7,7 @@ import { Job } from '../entities/job.entity';
 import { Application } from '../entities/application.entity';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([
-      Company,
-      Job,
-      Application,
-    ]),
-  ],
+  imports: [TypeOrmModule.forFeature([Company, Job, Application])],
   controllers: [CompaniesController],
   providers: [CompaniesService],
   exports: [CompaniesService],

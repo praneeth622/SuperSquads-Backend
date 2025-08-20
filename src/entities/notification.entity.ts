@@ -1,4 +1,11 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, Index } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  Index,
+} from 'typeorm';
 
 export enum NotificationType {
   EMAIL = 'email',
@@ -57,7 +64,7 @@ export class Notification {
   external_id: string; // Provider's message ID
 
   @Column({ type: 'text', nullable: true })
-  error_message: string;
+  error_message: string | null;
 
   @Column({ type: 'int', default: 0 })
   retry_count: number;

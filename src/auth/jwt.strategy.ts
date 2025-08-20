@@ -48,7 +48,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       // Update last login
       await this.userRepository.update(
         { id: user.id },
-        { last_login_at: new Date() }
+        { last_login_at: new Date() },
       );
 
       return user;
@@ -59,7 +59,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
   private async createUserFromJwt(payload: JwtPayload): Promise<User> {
     const emailDomain = payload.email.split('@')[1];
-    
+
     const userData = {
       id: payload.sub,
       email: payload.email,

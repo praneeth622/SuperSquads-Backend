@@ -1,4 +1,10 @@
-import { Injectable, NotFoundException, ForbiddenException, BadRequestException, ConflictException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ForbiddenException,
+  BadRequestException,
+  ConflictException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, SelectQueryBuilder, Like, In } from 'typeorm';
 import { Company } from '../entities/company.entity';
@@ -24,12 +30,17 @@ export class CompaniesService {
     private applicationRepository: Repository<Application>,
   ) {}
 
-  async createCompany(createCompanyDto: CreateCompanyDto, recruiterId?: string): Promise<CompanyResponseDto> {
+  async createCompany(
+    createCompanyDto: CreateCompanyDto,
+    recruiterId?: string,
+  ): Promise<CompanyResponseDto> {
     // Check if company with same name or domain already exists
     const existingCompany = await this.companyRepository.findOne({
       where: [
         { name: createCompanyDto.name },
-        ...(createCompanyDto.domain ? [{ domain: createCompanyDto.domain }] : []),
+        ...(createCompanyDto.domain
+          ? [{ domain: createCompanyDto.domain }]
+          : []),
       ],
     });
 
@@ -77,17 +88,24 @@ export class CompaniesService {
 
     // Only admins can verify companies
     if (updateCompanyDto.is_verified !== undefined && userRole !== 'admin') {
-      throw new ForbiddenException('Only admins can change verification status');
+      throw new ForbiddenException(
+        'Only admins can change verification status',
+      );
     }
 
     // Update company
     await this.companyRepository.update(id, updateCompanyDto);
 
-    const updatedCompany = await this.companyRepository.findOne({ where: { id } });
+    const updatedCompany = await this.companyRepository.findOne({
+      where: { id },
+    });
     return this.formatCompanyResponse(updatedCompany!);
   }
 
-  async getCompanyById(id: string, includeStats: boolean = false): Promise<CompanyResponseDto> {
+  async getCompanyById(
+    id: string,
+    includeStats: boolean = false,
+  ): Promise<CompanyResponseDto> {
     const company = await this.companyRepository.findOne({ where: { id } });
 
     if (!company) {
@@ -102,7 +120,9 @@ export class CompaniesService {
     return company ? this.formatCompanyResponse(company) : null;
   }
 
-  async searchCompanies(searchDto: CompanySearchDto): Promise<CompanyListResponseDto> {
+  async searchCompanies(
+    searchDto: CompanySearchDto,
+  ): Promise<CompanyListResponseDto> {
     const queryBuilder = this.companyRepository.createQueryBuilder('company');
 
     this.applySearchFilters(queryBuilder, searchDto);
@@ -115,7 +135,7 @@ export class CompaniesService {
     const companies = await queryBuilder.getMany();
 
     const companiesWithFormatting = await Promise.all(
-      companies.map(company => this.formatCompanyResponse(company))
+      companies.map((company) => this.formatCompanyResponse(company)),
     );
 
     return {
@@ -127,7 +147,9 @@ export class CompaniesService {
     };
   }
 
-  async getVerifiedCompanies(searchDto: CompanySearchDto): Promise<CompanyListResponseDto> {
+  async getVerifiedCompanies(
+    searchDto: CompanySearchDto,
+  ): Promise<CompanyListResponseDto> {
     const modifiedSearch = { ...searchDto, is_verified: true };
     return this.searchCompanies(modifiedSearch);
   }
@@ -145,7 +167,9 @@ export class CompaniesService {
 
   async getCompanyStats(): Promise<CompanyStatsDto> {
     const totalCompanies = await this.companyRepository.count();
-    const verifiedCompanies = await this.companyRepository.count({ where: { is_verified: true } });
+    const verifiedCompanies = await this.companyRepository.count({
+      where: { is_verified: true },
+    });
     const pendingVerification = totalCompanies - verifiedCompanies;
 
     // Get top industries
@@ -159,7 +183,7 @@ export class CompaniesService {
       .limit(10)
       .getRawMany();
 
-    const topIndustries = industryStats.map(stat => ({
+    const topIndustries = industryStats.map((stat) => ({
       industry: stat.industry,
       count: parseInt(stat.count),
     }));
@@ -173,10 +197,13 @@ export class CompaniesService {
       .groupBy('company.company_size')
       .getRawMany();
 
-    const byCompanySize = sizeStats.reduce((acc, stat) => {
-      acc[stat.size] = parseInt(stat.count);
-      return acc;
-    }, {} as Record<string, number>);
+    const byCompanySize = sizeStats.reduce(
+      (acc, stat) => {
+        acc[stat.size] = parseInt(stat.count);
+        return acc;
+      },
+      {} as Record<string, number>,
+    );
 
     return {
       total_companies: totalCompanies,
@@ -198,7 +225,9 @@ export class CompaniesService {
       is_verified: true,
     });
 
-    const updatedCompany = await this.companyRepository.findOne({ where: { id } });
+    const updatedCompany = await this.companyRepository.findOne({
+      where: { id },
+    });
     return this.formatCompanyResponse(updatedCompany!);
   }
 
@@ -228,49 +257,75 @@ export class CompaniesService {
     });
 
     if (activeJobs > 0) {
-      throw new BadRequestException('Cannot delete company with active job postings');
+      throw new BadRequestException(
+        'Cannot delete company with active job postings',
+      );
     }
 
     await this.companyRepository.delete(id);
   }
 
-  private applySearchFilters(queryBuilder: SelectQueryBuilder<Company>, searchDto: CompanySearchDto): void {
+  private applySearchFilters(
+    queryBuilder: SelectQueryBuilder<Company>,
+    searchDto: CompanySearchDto,
+  ): void {
     if (searchDto.search) {
       queryBuilder.andWhere(
         '(LOWER(company.name) LIKE LOWER(:search) OR LOWER(company.description) LIKE LOWER(:search))',
-        { search: `%${searchDto.search}%` }
+        { search: `%${searchDto.search}%` },
       );
     }
 
     if (searchDto.industry) {
-      queryBuilder.andWhere('company.industry = :industry', { industry: searchDto.industry });
+      queryBuilder.andWhere('company.industry = :industry', {
+        industry: searchDto.industry,
+      });
     }
 
     if (searchDto.company_size) {
-      queryBuilder.andWhere('company.company_size = :companySize', { companySize: searchDto.company_size });
+      queryBuilder.andWhere('company.company_size = :companySize', {
+        companySize: searchDto.company_size,
+      });
     }
 
     if (searchDto.is_verified !== undefined) {
-      queryBuilder.andWhere('company.is_verified = :isVerified', { isVerified: searchDto.is_verified });
+      queryBuilder.andWhere('company.is_verified = :isVerified', {
+        isVerified: searchDto.is_verified,
+      });
     }
   }
 
-  private applySorting(queryBuilder: SelectQueryBuilder<Company>, searchDto: CompanySearchDto): void {
+  private applySorting(
+    queryBuilder: SelectQueryBuilder<Company>,
+    searchDto: CompanySearchDto,
+  ): void {
     const { sort_by, sort_order } = searchDto;
-    
+
     switch (sort_by) {
       case 'created_at':
-        queryBuilder.orderBy('company.created_at', sort_order.toUpperCase() as 'ASC' | 'DESC');
+        queryBuilder.orderBy(
+          'company.created_at',
+          sort_order.toUpperCase() as 'ASC' | 'DESC',
+        );
         break;
       case 'updated_at':
-        queryBuilder.orderBy('company.updated_at', sort_order.toUpperCase() as 'ASC' | 'DESC');
+        queryBuilder.orderBy(
+          'company.updated_at',
+          sort_order.toUpperCase() as 'ASC' | 'DESC',
+        );
         break;
       default:
-        queryBuilder.orderBy('company.name', sort_order.toUpperCase() as 'ASC' | 'DESC');
+        queryBuilder.orderBy(
+          'company.name',
+          sort_order.toUpperCase() as 'ASC' | 'DESC',
+        );
     }
   }
 
-  private async formatCompanyResponse(company: Company, includeStats: boolean = false): Promise<CompanyResponseDto> {
+  private async formatCompanyResponse(
+    company: Company,
+    includeStats: boolean = false,
+  ): Promise<CompanyResponseDto> {
     const response: any = {
       id: company.id,
       name: company.name,
@@ -288,9 +343,13 @@ export class CompaniesService {
 
     if (includeStats) {
       // Get job and application statistics
-      const totalJobs = await this.jobRepository.count({ where: { company_id: company.id } });
-      const activeJobs = await this.jobRepository.count({ where: { company_id: company.id, is_active: true } });
-      
+      const totalJobs = await this.jobRepository.count({
+        where: { company_id: company.id },
+      });
+      const activeJobs = await this.jobRepository.count({
+        where: { company_id: company.id, is_active: true },
+      });
+
       // Get total applications for this company's jobs
       const jobIds = await this.jobRepository.find({
         where: { company_id: company.id },
@@ -300,7 +359,7 @@ export class CompaniesService {
       let totalApplications = 0;
       if (jobIds.length > 0) {
         totalApplications = await this.applicationRepository.count({
-          where: { job_id: In(jobIds.map(job => job.id)) },
+          where: { job_id: In(jobIds.map((job) => job.id)) },
         });
       }
 

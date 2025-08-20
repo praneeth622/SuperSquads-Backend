@@ -49,7 +49,9 @@ export class JobsController {
 
   @Get()
   @UsePipes(new ZodValidationPipe(JobSearchSchema))
-  async searchJobs(@Query() searchDto: JobSearchDto): Promise<JobListResponseDto> {
+  async searchJobs(
+    @Query() searchDto: JobSearchDto,
+  ): Promise<JobListResponseDto> {
     return this.jobsService.searchJobs(searchDto);
   }
 
@@ -61,11 +63,17 @@ export class JobsController {
     @Query('page') page = 1,
     @Query('limit') limit = 20,
   ): Promise<JobListResponseDto> {
-    return this.jobsService.getRecruiterJobs(user.id, Number(page), Number(limit));
+    return this.jobsService.getRecruiterJobs(
+      user.id,
+      Number(page),
+      Number(limit),
+    );
   }
 
   @Get(':id')
-  async getJobById(@Param('id', ParseUUIDPipe) id: string): Promise<JobResponseDto> {
+  async getJobById(
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<JobResponseDto> {
     return this.jobsService.findJobById(id);
   }
 

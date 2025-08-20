@@ -12,13 +12,13 @@ import {
   HttpStatus,
   ParseUUIDPipe,
 } from '@nestjs/common';
-import { 
-  ApiTags, 
-  ApiOperation, 
-  ApiResponse, 
-  ApiBearerAuth, 
-  ApiParam, 
-  ApiQuery, 
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+  ApiParam,
+  ApiQuery,
   ApiBody,
   ApiExtraModels,
 } from '@nestjs/swagger';
@@ -38,7 +38,13 @@ import {
 
 @ApiTags('companies')
 @ApiBearerAuth()
-@ApiExtraModels(CreateCompanyDto, UpdateCompanyDto, CompanyResponseDto, CompanyListResponseDto, CompanyStatsDto)
+@ApiExtraModels(
+  CreateCompanyDto,
+  UpdateCompanyDto,
+  CompanyResponseDto,
+  CompanyListResponseDto,
+  CompanyStatsDto,
+)
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('companies')
 export class CompaniesController {
@@ -46,9 +52,10 @@ export class CompaniesController {
 
   @Post()
   @Roles(UserRole.RECRUITER, UserRole.ADMIN)
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Create a new company',
-    description: 'Recruiters can create company profiles. New companies require admin verification before being fully active.'
+    description:
+      'Recruiters can create company profiles. New companies require admin verification before being fully active.',
   })
   @ApiBody({
     type: CreateCompanyDto,
@@ -60,8 +67,8 @@ export class CompaniesController {
         value: {
           name: 'TechCorp Solutions',
           website: 'https://techcorp.com',
-          domain: 'techcorp.com'
-        }
+          domain: 'techcorp.com',
+        },
       },
       complete: {
         summary: 'Complete company profile',
@@ -70,14 +77,15 @@ export class CompaniesController {
           name: 'TechCorp Solutions',
           website: 'https://techcorp.com',
           domain: 'techcorp.com',
-          description: 'Leading technology company focused on innovative software solutions for enterprises. We specialize in cloud infrastructure, AI/ML solutions, and fintech applications.',
+          description:
+            'Leading technology company focused on innovative software solutions for enterprises. We specialize in cloud infrastructure, AI/ML solutions, and fintech applications.',
           logo_url: 'https://techcorp.com/logo.png',
           industry: 'Technology',
           company_size: '51-200',
-          headquarters: 'San Francisco, CA, USA'
-        }
-      }
-    }
+          headquarters: 'San Francisco, CA, USA',
+        },
+      },
+    },
   })
   @ApiResponse({
     status: HttpStatus.CREATED,
@@ -88,16 +96,17 @@ export class CompaniesController {
         name: 'TechCorp Solutions',
         website: 'https://techcorp.com',
         domain: 'techcorp.com',
-        description: 'Leading technology company focused on innovative software solutions',
+        description:
+          'Leading technology company focused on innovative software solutions',
         logo_url: 'https://techcorp.com/logo.png',
         industry: 'Technology',
         company_size: '51-200',
         headquarters: 'San Francisco, CA, USA',
         is_verified: false,
         created_at: '2024-03-15T10:30:00.000Z',
-        updated_at: '2024-03-15T10:30:00.000Z'
-      }
-    }
+        updated_at: '2024-03-15T10:30:00.000Z',
+      },
+    },
   })
   @ApiResponse({
     status: HttpStatus.CONFLICT,
@@ -111,18 +120,54 @@ export class CompaniesController {
   }
 
   @Get()
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Search and list companies',
-    description: 'Get a paginated list of companies with optional search and filtering'
+    description:
+      'Get a paginated list of companies with optional search and filtering',
   })
-  @ApiQuery({ name: 'search', required: false, description: 'Search in company name and description' })
-  @ApiQuery({ name: 'industry', required: false, description: 'Filter by industry' })
-  @ApiQuery({ name: 'company_size', required: false, description: 'Filter by company size' })
-  @ApiQuery({ name: 'is_verified', required: false, type: Boolean, description: 'Filter by verification status' })
-  @ApiQuery({ name: 'page', required: false, type: Number, description: 'Page number (default: 1)' })
-  @ApiQuery({ name: 'limit', required: false, type: Number, description: 'Items per page (default: 20)' })
-  @ApiQuery({ name: 'sort_by', required: false, description: 'Sort field (default: name)' })
-  @ApiQuery({ name: 'sort_order', required: false, description: 'Sort order (asc/desc, default: asc)' })
+  @ApiQuery({
+    name: 'search',
+    required: false,
+    description: 'Search in company name and description',
+  })
+  @ApiQuery({
+    name: 'industry',
+    required: false,
+    description: 'Filter by industry',
+  })
+  @ApiQuery({
+    name: 'company_size',
+    required: false,
+    description: 'Filter by company size',
+  })
+  @ApiQuery({
+    name: 'is_verified',
+    required: false,
+    type: Boolean,
+    description: 'Filter by verification status',
+  })
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    type: Number,
+    description: 'Page number (default: 1)',
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    type: Number,
+    description: 'Items per page (default: 20)',
+  })
+  @ApiQuery({
+    name: 'sort_by',
+    required: false,
+    description: 'Sort field (default: name)',
+  })
+  @ApiQuery({
+    name: 'sort_order',
+    required: false,
+    description: 'Sort order (asc/desc, default: asc)',
+  })
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Companies retrieved successfully',
@@ -141,38 +186,43 @@ export class CompaniesController {
             headquarters: 'San Francisco, CA, USA',
             is_verified: true,
             created_at: '2024-03-15T10:30:00.000Z',
-            updated_at: '2024-03-15T10:30:00.000Z'
-          }
+            updated_at: '2024-03-15T10:30:00.000Z',
+          },
         ],
         total: 150,
         page: 1,
         limit: 20,
-        total_pages: 8
-      }
-    }
+        total_pages: 8,
+      },
+    },
   })
-  async findAll(@Query() searchDto: CompanySearchDto): Promise<CompanyListResponseDto> {
+  async findAll(
+    @Query() searchDto: CompanySearchDto,
+  ): Promise<CompanyListResponseDto> {
     return this.companiesService.searchCompanies(searchDto);
   }
 
   @Get('verified')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Get verified companies only',
-    description: 'List all verified companies available for job postings'
+    description: 'List all verified companies available for job postings',
   })
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Verified companies retrieved successfully',
   })
-  async getVerified(@Query() searchDto: CompanySearchDto): Promise<CompanyListResponseDto> {
+  async getVerified(
+    @Query() searchDto: CompanySearchDto,
+  ): Promise<CompanyListResponseDto> {
     return this.companiesService.getVerifiedCompanies(searchDto);
   }
 
   @Get('stats')
   @Roles(UserRole.ADMIN)
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Get company statistics (admin only)',
-    description: 'Get comprehensive statistics about companies, industries, and verification status'
+    description:
+      'Get comprehensive statistics about companies, industries, and verification status',
   })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -185,7 +235,7 @@ export class CompaniesController {
         top_industries: [
           { industry: 'Technology', count: 45 },
           { industry: 'Finance', count: 30 },
-          { industry: 'Healthcare', count: 20 }
+          { industry: 'Healthcare', count: 20 },
         ],
         by_company_size: {
           '1-10': 20,
@@ -194,10 +244,10 @@ export class CompaniesController {
           '201-500': 25,
           '501-1000': 15,
           '1001-5000': 10,
-          '5000+': 5
-        }
-      }
-    }
+          '5000+': 5,
+        },
+      },
+    },
   })
   async getStats(): Promise<CompanyStatsDto> {
     return this.companiesService.getCompanyStats();
@@ -205,9 +255,9 @@ export class CompaniesController {
 
   @Get('pending-verification')
   @Roles(UserRole.ADMIN)
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Get companies pending verification (admin only)',
-    description: 'Get list of companies awaiting admin verification'
+    description: 'Get list of companies awaiting admin verification',
   })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -218,12 +268,18 @@ export class CompaniesController {
   }
 
   @Get(':id')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Get company by ID',
-    description: 'Get detailed information about a specific company including job statistics'
+    description:
+      'Get detailed information about a specific company including job statistics',
   })
   @ApiParam({ name: 'id', type: 'string', description: 'Company ID' })
-  @ApiQuery({ name: 'include_stats', required: false, type: Boolean, description: 'Include job and application statistics' })
+  @ApiQuery({
+    name: 'include_stats',
+    required: false,
+    type: Boolean,
+    description: 'Include job and application statistics',
+  })
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Company retrieved successfully',
@@ -233,7 +289,8 @@ export class CompaniesController {
         name: 'TechCorp Solutions',
         website: 'https://techcorp.com',
         domain: 'techcorp.com',
-        description: 'Leading technology company focused on innovative solutions',
+        description:
+          'Leading technology company focused on innovative solutions',
         logo_url: 'https://techcorp.com/logo.png',
         industry: 'Technology',
         company_size: '51-200',
@@ -243,9 +300,9 @@ export class CompaniesController {
         active_jobs: 8,
         total_applications: 150,
         created_at: '2024-03-15T10:30:00.000Z',
-        updated_at: '2024-03-15T10:30:00.000Z'
-      }
-    }
+        updated_at: '2024-03-15T10:30:00.000Z',
+      },
+    },
   })
   @ApiResponse({
     status: HttpStatus.NOT_FOUND,
@@ -260,9 +317,10 @@ export class CompaniesController {
 
   @Patch(':id')
   @Roles(UserRole.RECRUITER, UserRole.ADMIN)
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Update company information',
-    description: 'Update company profile. Only admins can change verification status.'
+    description:
+      'Update company profile. Only admins can change verification status.',
   })
   @ApiParam({ name: 'id', type: 'string', description: 'Company ID' })
   @ApiBody({
@@ -273,20 +331,21 @@ export class CompaniesController {
         summary: 'Basic update',
         description: 'Update basic company information',
         value: {
-          description: 'Updated company description with more details about our services',
+          description:
+            'Updated company description with more details about our services',
           website: 'https://techcorp.com',
-          headquarters: 'New York, NY, USA'
-        }
+          headquarters: 'New York, NY, USA',
+        },
       },
       admin_verification: {
         summary: 'Admin verification (admin only)',
         description: 'Admin updating verification status',
         value: {
           is_verified: true,
-          name: 'TechCorp Solutions Inc'
-        }
-      }
-    }
+          name: 'TechCorp Solutions Inc',
+        },
+      },
+    },
   })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -305,14 +364,19 @@ export class CompaniesController {
     @Body() updateCompanyDto: UpdateCompanyDto,
     @Request() req: any,
   ): Promise<CompanyResponseDto> {
-    return this.companiesService.updateCompany(id, updateCompanyDto, req.user.sub, req.user.role);
+    return this.companiesService.updateCompany(
+      id,
+      updateCompanyDto,
+      req.user.sub,
+      req.user.role,
+    );
   }
 
   @Patch(':id/verify')
   @Roles(UserRole.ADMIN)
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Verify company (admin only)',
-    description: 'Mark a company as verified, allowing it to post jobs'
+    description: 'Mark a company as verified, allowing it to post jobs',
   })
   @ApiParam({ name: 'id', type: 'string', description: 'Company ID' })
   @ApiResponse({
@@ -323,15 +387,17 @@ export class CompaniesController {
     status: HttpStatus.NOT_FOUND,
     description: 'Company not found',
   })
-  async verify(@Param('id', ParseUUIDPipe) id: string): Promise<CompanyResponseDto> {
+  async verify(
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<CompanyResponseDto> {
     return this.companiesService.verifyCompany(id);
   }
 
   @Patch(':id/reject')
   @Roles(UserRole.ADMIN)
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Reject company verification (admin only)',
-    description: 'Mark a company as rejected for verification'
+    description: 'Mark a company as rejected for verification',
   })
   @ApiParam({ name: 'id', type: 'string', description: 'Company ID' })
   @ApiBody({
@@ -342,10 +408,10 @@ export class CompaniesController {
         reason: {
           type: 'string',
           description: 'Reason for rejection',
-          example: 'Insufficient company information provided'
-        }
-      }
-    }
+          example: 'Insufficient company information provided',
+        },
+      },
+    },
   })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -364,9 +430,10 @@ export class CompaniesController {
 
   @Delete(':id')
   @Roles(UserRole.ADMIN)
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Delete company (admin only)',
-    description: 'Permanently delete a company. Cannot delete companies with active job postings.'
+    description:
+      'Permanently delete a company. Cannot delete companies with active job postings.',
   })
   @ApiParam({ name: 'id', type: 'string', description: 'Company ID' })
   @ApiResponse({

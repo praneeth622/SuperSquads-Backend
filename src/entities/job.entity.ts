@@ -1,4 +1,13 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn, Index } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  ManyToOne,
+  JoinColumn,
+  Index,
+} from 'typeorm';
 import { Company } from './company.entity';
 import { User } from './user.entity';
 
@@ -72,11 +81,11 @@ export class Job {
   @Column({ type: 'text', array: true, default: '{}' })
   locations: string[]; // ["Mumbai", "Bangalore", "Remote"]
 
-  @Column({ 
-    type: 'enum', 
+  @Column({
+    type: 'enum',
     enum: WorkMode,
-    array: true, 
-    default: [WorkMode.REMOTE] 
+    array: true,
+    default: [WorkMode.REMOTE],
   })
   work_modes: WorkMode[];
 

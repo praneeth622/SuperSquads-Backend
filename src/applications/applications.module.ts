@@ -10,13 +10,7 @@ import { StudentProfile } from '../entities/student-profile.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([
-      Application,
-      Job,
-      User,
-      File,
-      StudentProfile,
-    ]),
+    TypeOrmModule.forFeature([Application, Job, User, File, StudentProfile]),
   ],
   controllers: [ApplicationsController],
   providers: [ApplicationsService],

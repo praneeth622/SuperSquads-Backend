@@ -1,17 +1,26 @@
-import { Injectable, NotFoundException, BadRequestException, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, SelectQueryBuilder } from 'typeorm';
-import { File, FileType as EntityFileType, FileStatus as EntityFileStatus } from '../entities/file.entity';
+import {
+  File,
+  FileType as EntityFileType,
+  FileStatus as EntityFileStatus,
+} from '../entities/file.entity';
 import { User } from '../entities/user.entity';
-import { 
-  CreateFileDto, 
-  UpdateFileDto, 
+import {
+  CreateFileDto,
+  UpdateFileDto,
   FileSearchDto,
   FileUploadUrlDto,
   FileType,
   FileStatus,
   FileVisibility,
-  ScanStatus
+  ScanStatus,
 } from './dto/file.dto';
 import { ConfigService } from '@nestjs/config';
 
@@ -28,10 +37,13 @@ export class FilesService {
   /**
    * Generate pre-signed upload URL
    */
-  async generateUploadUrl(userId: string, createDto: CreateFileDto): Promise<FileUploadUrlDto> {
+  async generateUploadUrl(
+    userId: string,
+    createDto: CreateFileDto,
+  ): Promise<FileUploadUrlDto> {
     // Validate user exists
     const user = await this.userRepository.findOne({
-      where: { id: userId }
+      where: { id: userId },
     });
 
     if (!user) {
@@ -41,13 +53,17 @@ export class FilesService {
     // Validate file size
     const maxSize = this.configService.get<number>('MAX_FILE_SIZE', 104857600); // 100MB default
     if (createDto.file_size > maxSize) {
-      throw new BadRequestException(`File size exceeds maximum allowed size of ${maxSize} bytes`);
+      throw new BadRequestException(
+        `File size exceeds maximum allowed size of ${maxSize} bytes`,
+      );
     }
 
     // Validate MIME type
     const allowedMimeTypes = this.getAllowedMimeTypes();
     if (!allowedMimeTypes.includes(createDto.mime_type)) {
-      throw new BadRequestException(`MIME type ${createDto.mime_type} is not allowed`);
+      throw new BadRequestException(
+        `MIME type ${createDto.mime_type} is not allowed`,
+      );
     }
 
     // Create file record with pending status
@@ -80,9 +96,12 @@ export class FilesService {
     await this.fileRepository.save(savedFile);
 
     // Generate pre-signed URL (mock implementation)
-    const baseUrl = this.configService.get<string>('STORAGE_BASE_URL', 'https://storage.example.com');
+    const baseUrl = this.configService.get<string>(
+      'STORAGE_BASE_URL',
+      'https://storage.example.com',
+    );
     const uploadUrl = `${baseUrl}/upload/${storageKey}?token=${this.generateUploadToken()}`;
-    
+
     const expiresAt = new Date();
     expiresAt.setHours(expiresAt.getHours() + 1); // 1 hour expiry
 
@@ -103,7 +122,7 @@ export class FilesService {
    */
   async confirmUpload(fileId: string, userId: string): Promise<any> {
     const file = await this.fileRepository.findOne({
-      where: { id: fileId, uploaded_by: userId }
+      where: { id: fileId, uploaded_by: userId },
     });
 
     if (!file) {
@@ -120,7 +139,7 @@ export class FilesService {
       ...file.metadata,
       scan_status: ScanStatus.SCANNING,
     };
-    
+
     const updatedFile = await this.fileRepository.save(file);
 
     // Trigger async processing (virus scan, text extraction, etc.)
@@ -132,15 +151,23 @@ export class FilesService {
   /**
    * Get all files for a user with filtering and pagination
    */
-  async findUserFiles(userId: string, searchDto: FileSearchDto): Promise<{
+  async findUserFiles(
+    userId: string,
+    searchDto: FileSearchDto,
+  ): Promise<{
     files: any[];
     total: number;
     page: number;
     limit: number;
     totalPages: number;
   }> {
-    const { page = 1, limit = 20, sort_by = 'created_at', sort_order = 'desc' } = searchDto;
-    
+    const {
+      page = 1,
+      limit = 20,
+      sort_by = 'created_at',
+      sort_order = 'desc',
+    } = searchDto;
+
     const queryBuilder = this.fileRepository
       .createQueryBuilder('file')
       .where('file.uploaded_by = :userId', { userId })
@@ -151,7 +178,10 @@ export class FilesService {
 
     // Apply sorting
     const sortField = this.validateSortField(sort_by);
-    queryBuilder.orderBy(`file.${sortField}`, sort_order.toUpperCase() as 'ASC' | 'DESC');
+    queryBuilder.orderBy(
+      `file.${sortField}`,
+      sort_order.toUpperCase() as 'ASC' | 'DESC',
+    );
 
     // Apply pagination
     const skip = (page - 1) * limit;
@@ -166,7 +196,7 @@ export class FilesService {
         ...file,
         download_url: await this.generateDownloadUrl(file),
         preview_url: await this.generatePreviewUrl(file),
-      }))
+      })),
     );
 
     return {
@@ -206,9 +236,13 @@ export class FilesService {
   /**
    * Update file metadata
    */
-  async updateFile(fileId: string, userId: string, updateDto: UpdateFileDto): Promise<any> {
+  async updateFile(
+    fileId: string,
+    userId: string,
+    updateDto: UpdateFileDto,
+  ): Promise<any> {
     const file = await this.fileRepository.findOne({
-      where: { id: fileId, uploaded_by: userId }
+      where: { id: fileId, uploaded_by: userId },
     });
 
     if (!file || file.deleted_at) {
@@ -216,20 +250,26 @@ export class FilesService {
     }
 
     // Update allowed fields
-    if (updateDto.original_name !== undefined) file.original_name = updateDto.original_name;
-    if (updateDto.file_type !== undefined) file.file_type = this.mapFileType(updateDto.file_type);
-    if (updateDto.status !== undefined) file.status = this.mapFileStatus(updateDto.status);
+    if (updateDto.original_name !== undefined)
+      file.original_name = updateDto.original_name;
+    if (updateDto.file_type !== undefined)
+      file.file_type = this.mapFileType(updateDto.file_type);
+    if (updateDto.status !== undefined)
+      file.status = this.mapFileStatus(updateDto.status);
 
     // Update metadata
     const updatedMetadata = { ...file.metadata };
-    if (updateDto.description !== undefined) updatedMetadata.description = updateDto.description;
+    if (updateDto.description !== undefined)
+      updatedMetadata.description = updateDto.description;
     if (updateDto.visibility !== undefined) {
       updatedMetadata.visibility = updateDto.visibility;
       file.is_public = updateDto.visibility === FileVisibility.PUBLIC;
     }
     if (updateDto.tags !== undefined) updatedMetadata.tags = updateDto.tags;
-    if (updateDto.entity_id !== undefined) updatedMetadata.entity_id = updateDto.entity_id;
-    if (updateDto.entity_type !== undefined) updatedMetadata.entity_type = updateDto.entity_type;
+    if (updateDto.entity_id !== undefined)
+      updatedMetadata.entity_id = updateDto.entity_id;
+    if (updateDto.entity_type !== undefined)
+      updatedMetadata.entity_type = updateDto.entity_type;
 
     file.metadata = updatedMetadata;
 
@@ -242,7 +282,7 @@ export class FilesService {
    */
   async deleteFile(fileId: string, userId: string): Promise<void> {
     const file = await this.fileRepository.findOne({
-      where: { id: fileId, uploaded_by: userId }
+      where: { id: fileId, uploaded_by: userId },
     });
 
     if (!file || file.deleted_at) {
@@ -260,7 +300,10 @@ export class FilesService {
   /**
    * Get download URL for a file
    */
-  async getDownloadUrl(fileId: string, userId: string): Promise<{ download_url: string; expires_at: Date }> {
+  async getDownloadUrl(
+    fileId: string,
+    userId: string,
+  ): Promise<{ download_url: string; expires_at: Date }> {
     const file = await this.findFileById(fileId, userId);
 
     if (file.status !== EntityFileStatus.PROCESSED) {
@@ -285,32 +328,38 @@ export class FilesService {
   /**
    * Get files by entity (job, application, etc.)
    */
-  async findFilesByEntity(entityType: string, entityId: string, userId?: string): Promise<any[]> {
+  async findFilesByEntity(
+    entityType: string,
+    entityId: string,
+    userId?: string,
+  ): Promise<any[]> {
     const queryBuilder = this.fileRepository
       .createQueryBuilder('file')
       .where('file.deleted_at IS NULL')
-      .andWhere('file.metadata ->> :entityTypeKey = :entityType', { 
-        entityTypeKey: 'entity_type', 
-        entityType 
+      .andWhere('file.metadata ->> :entityTypeKey = :entityType', {
+        entityTypeKey: 'entity_type',
+        entityType,
       })
-      .andWhere('file.metadata ->> :entityIdKey = :entityId', { 
-        entityIdKey: 'entity_id', 
-        entityId 
+      .andWhere('file.metadata ->> :entityIdKey = :entityId', {
+        entityIdKey: 'entity_id',
+        entityId,
       })
-      .andWhere('file.status = :status', { status: EntityFileStatus.PROCESSED });
+      .andWhere('file.status = :status', {
+        status: EntityFileStatus.PROCESSED,
+      });
 
     // If userId is provided, check ownership or public visibility
     if (userId) {
       queryBuilder.andWhere(
         '(file.uploaded_by = :userId OR file.is_public = true)',
-        { userId }
+        { userId },
       );
     } else {
       queryBuilder.andWhere('file.is_public = true');
     }
 
     const files = await queryBuilder.getMany();
-    return files.map(file => this.transformFileToDto(file));
+    return files.map((file) => this.transformFileToDto(file));
   }
 
   /**
@@ -332,7 +381,7 @@ export class FilesService {
     const baseQuery = this.fileRepository
       .createQueryBuilder('file')
       .where('file.deleted_at IS NULL');
-    
+
     if (userId) {
       baseQuery.andWhere('file.uploaded_by = :userId', { userId });
     }
@@ -358,10 +407,13 @@ export class FilesService {
       .groupBy('file.file_type')
       .getRawMany();
 
-    const by_file_type = typeStats.reduce((acc, stat) => {
-      acc[stat.file_type] = parseInt(stat.count);
-      return acc;
-    }, {} as Record<string, number>);
+    const by_file_type = typeStats.reduce(
+      (acc, stat) => {
+        acc[stat.file_type] = parseInt(stat.count);
+        return acc;
+      },
+      {} as Record<string, number>,
+    );
 
     // Files by status
     const statusStats = await this.fileRepository
@@ -373,15 +425,18 @@ export class FilesService {
       .groupBy('file.status')
       .getRawMany();
 
-    const by_status = statusStats.reduce((acc, stat) => {
-      acc[stat.status] = parseInt(stat.count);
-      return acc;
-    }, {} as Record<string, number>);
+    const by_status = statusStats.reduce(
+      (acc, stat) => {
+        acc[stat.status] = parseInt(stat.count);
+        return acc;
+      },
+      {} as Record<string, number>,
+    );
 
     // Recent uploads (last 30 days)
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-    
+
     const recent_uploads = await this.fileRepository
       .createQueryBuilder('file')
       .where('file.created_at >= :date', { date: thirtyDaysAgo })
@@ -402,7 +457,7 @@ export class FilesService {
       .limit(5)
       .getRawMany();
 
-    const top_storage_types = storageStats.map(stat => ({
+    const top_storage_types = storageStats.map((stat) => ({
       file_type: stat.file_type,
       count: parseInt(stat.count),
       total_size: parseInt(stat.total_size),
@@ -448,22 +503,36 @@ export class FilesService {
     return mapping[dtoStatus] || EntityFileStatus.UPLOADED;
   }
 
-  private applySearchFilters(queryBuilder: SelectQueryBuilder<File>, searchDto: FileSearchDto): void {
-    const { 
-      filename, file_type, status, visibility, mime_type, 
-      min_size, max_size, tags, entity_type, entity_id,
-      created_after, created_before 
+  private applySearchFilters(
+    queryBuilder: SelectQueryBuilder<File>,
+    searchDto: FileSearchDto,
+  ): void {
+    const {
+      filename,
+      file_type,
+      status,
+      visibility,
+      mime_type,
+      min_size,
+      max_size,
+      tags,
+      entity_type,
+      entity_id,
+      created_after,
+      created_before,
     } = searchDto;
 
     if (filename) {
       queryBuilder.andWhere('LOWER(file.original_name) LIKE LOWER(:filename)', {
-        filename: `%${filename}%`
+        filename: `%${filename}%`,
       });
     }
 
     if (file_type) {
       const mappedType = this.mapFileType(file_type);
-      queryBuilder.andWhere('file.file_type = :file_type', { file_type: mappedType });
+      queryBuilder.andWhere('file.file_type = :file_type', {
+        file_type: mappedType,
+      });
     }
 
     if (status) {
@@ -492,37 +561,41 @@ export class FilesService {
     }
 
     if (tags) {
-      const tagArray = tags.split(',').map(t => t.trim());
+      const tagArray = tags.split(',').map((t) => t.trim());
       const tagConditions = tagArray.map((tag, index) => {
         queryBuilder.setParameter(`tag_${index}`, `%${tag}%`);
         return `file.metadata ->> 'tags' LIKE :tag_${index}`;
       });
-      
+
       if (tagConditions.length > 0) {
         queryBuilder.andWhere(`(${tagConditions.join(' OR ')})`);
       }
     }
 
     if (entity_type) {
-      queryBuilder.andWhere('file.metadata ->> :entityTypeKey = :entity_type', { 
-        entityTypeKey: 'entity_type', 
-        entity_type 
+      queryBuilder.andWhere('file.metadata ->> :entityTypeKey = :entity_type', {
+        entityTypeKey: 'entity_type',
+        entity_type,
       });
     }
 
     if (entity_id) {
-      queryBuilder.andWhere('file.metadata ->> :entityIdKey = :entity_id', { 
-        entityIdKey: 'entity_id', 
-        entity_id 
+      queryBuilder.andWhere('file.metadata ->> :entityIdKey = :entity_id', {
+        entityIdKey: 'entity_id',
+        entity_id,
       });
     }
 
     if (created_after) {
-      queryBuilder.andWhere('file.created_at >= :created_after', { created_after });
+      queryBuilder.andWhere('file.created_at >= :created_after', {
+        created_after,
+      });
     }
 
     if (created_before) {
-      queryBuilder.andWhere('file.created_at <= :created_before', { created_before });
+      queryBuilder.andWhere('file.created_at <= :created_before', {
+        created_before,
+      });
     }
   }
 
@@ -554,11 +627,17 @@ export class FilesService {
   }
 
   private generateUploadToken(): string {
-    return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+    return (
+      Math.random().toString(36).substring(2, 15) +
+      Math.random().toString(36).substring(2, 15)
+    );
   }
 
   private async generateDownloadUrl(file: File): Promise<string> {
-    const baseUrl = this.configService.get<string>('STORAGE_BASE_URL', 'https://storage.example.com');
+    const baseUrl = this.configService.get<string>(
+      'STORAGE_BASE_URL',
+      'https://storage.example.com',
+    );
     const token = this.generateUploadToken();
     return `${baseUrl}/download/${file.storage_key}?token=${token}`;
   }
@@ -568,7 +647,10 @@ export class FilesService {
       return null;
     }
 
-    const baseUrl = this.configService.get<string>('STORAGE_BASE_URL', 'https://storage.example.com');
+    const baseUrl = this.configService.get<string>(
+      'STORAGE_BASE_URL',
+      'https://storage.example.com',
+    );
     const token = this.generateUploadToken();
     return `${baseUrl}/preview/${file.storage_key}?token=${token}`;
   }
@@ -627,7 +709,7 @@ export class FilesService {
    */
   private transformFileToDto(file: File): any {
     const metadata = file.metadata || {};
-    
+
     return {
       id: file.id,
       user_id: file.uploaded_by,
@@ -637,7 +719,9 @@ export class FilesService {
       mime_type: file.mime_type,
       file_size: file.size_bytes,
       status: this.mapEntityFileStatusToDto(file.status),
-      visibility: metadata.visibility || (file.is_public ? FileVisibility.PUBLIC : FileVisibility.PRIVATE),
+      visibility:
+        metadata.visibility ||
+        (file.is_public ? FileVisibility.PUBLIC : FileVisibility.PRIVATE),
       description: metadata.description || null,
       tags: metadata.tags || [],
       entity_id: metadata.entity_id || null,

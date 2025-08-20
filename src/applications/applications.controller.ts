@@ -12,13 +12,13 @@ import {
   HttpStatus,
   ParseUUIDPipe,
 } from '@nestjs/common';
-import { 
-  ApiTags, 
-  ApiOperation, 
-  ApiResponse, 
-  ApiBearerAuth, 
-  ApiParam, 
-  ApiQuery, 
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+  ApiParam,
+  ApiQuery,
   ApiBody,
   ApiExtraModels,
 } from '@nestjs/swagger';
@@ -38,7 +38,13 @@ import {
 
 @ApiTags('applications')
 @ApiBearerAuth()
-@ApiExtraModels(CreateApplicationDto, UpdateApplicationDto, ApplicationResponseDto, ApplicationListResponseDto, ApplicationStatsDto)
+@ApiExtraModels(
+  CreateApplicationDto,
+  UpdateApplicationDto,
+  ApplicationResponseDto,
+  ApplicationListResponseDto,
+  ApplicationStatsDto,
+)
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('applications')
 export class ApplicationsController {
@@ -46,9 +52,10 @@ export class ApplicationsController {
 
   @Post()
   @Roles(UserRole.STUDENT)
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Submit a job application',
-    description: 'Students can submit applications for jobs with optional cover letter, resume, and answers to job-specific questions.'
+    description:
+      'Students can submit applications for jobs with optional cover letter, resume, and answers to job-specific questions.',
   })
   @ApiBody({
     type: CreateApplicationDto,
@@ -58,26 +65,28 @@ export class ApplicationsController {
         summary: 'Basic application',
         description: 'Minimal application with just job ID',
         value: {
-          job_id: '123e4567-e89b-12d3-a456-426614174000'
-        }
+          job_id: '123e4567-e89b-12d3-a456-426614174000',
+        },
       },
       complete: {
         summary: 'Complete application',
         description: 'Application with all optional fields',
         value: {
           job_id: '123e4567-e89b-12d3-a456-426614174000',
-          cover_letter: 'I am very interested in this Software Engineer position because of my strong background in full-stack development. My experience with React, Node.js, and TypeScript aligns perfectly with your requirements. I am particularly excited about your company\'s mission to democratize financial services.',
+          cover_letter:
+            "I am very interested in this Software Engineer position because of my strong background in full-stack development. My experience with React, Node.js, and TypeScript aligns perfectly with your requirements. I am particularly excited about your company's mission to democratize financial services.",
           resume_file_id: '987fcdeb-51a2-43d1-b456-426614174111',
           answers: {
-            'years_of_experience': '2-3 years',
-            'preferred_location': 'Remote/Hybrid',
-            'availability': 'Can start immediately',
-            'salary_expectation': '12-15 LPA',
-            'tech_stack_experience': 'React, Node.js, TypeScript, PostgreSQL, AWS'
-          }
-        }
-      }
-    }
+            years_of_experience: '2-3 years',
+            preferred_location: 'Remote/Hybrid',
+            availability: 'Can start immediately',
+            salary_expectation: '12-15 LPA',
+            tech_stack_experience:
+              'React, Node.js, TypeScript, PostgreSQL, AWS',
+          },
+        },
+      },
+    },
   })
   @ApiResponse({
     status: HttpStatus.CREATED,
@@ -88,8 +97,8 @@ export class ApplicationsController {
         status: 'applied',
         cover_letter: 'I am very interested in this position...',
         answers: {
-          'years_of_experience': '2-3 years',
-          'preferred_location': 'Remote/Hybrid'
+          years_of_experience: '2-3 years',
+          preferred_location: 'Remote/Hybrid',
         },
         job: {
           id: '456e7890-e89b-12d3-a456-426614174001',
@@ -98,19 +107,19 @@ export class ApplicationsController {
           company: {
             id: '789e0123-e89b-12d3-a456-426614174002',
             name: 'TechCorp Solutions',
-            logo_url: 'https://example.com/logo.png'
-          }
+            logo_url: 'https://example.com/logo.png',
+          },
         },
         resume_file: {
           id: '987fcdeb-51a2-43d1-b456-426614174111',
           original_name: 'john_doe_resume.pdf',
-          public_url: 'https://storage.example.com/resumes/john-doe-resume.pdf'
+          public_url: 'https://storage.example.com/resumes/john-doe-resume.pdf',
         },
         submitted_at: '2024-03-15T10:30:00.000Z',
         updated_at: '2024-03-15T10:30:00.000Z',
-        reviewed_at: null
-      }
-    }
+        reviewed_at: null,
+      },
+    },
   })
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,
@@ -128,7 +137,10 @@ export class ApplicationsController {
     @Body() createApplicationDto: CreateApplicationDto,
     @Request() req: any,
   ): Promise<ApplicationResponseDto> {
-    return this.applicationsService.createApplication(createApplicationDto, req.user.sub);
+    return this.applicationsService.createApplication(
+      createApplicationDto,
+      req.user.sub,
+    );
   }
 
   @Get('my-applications')
@@ -138,17 +150,46 @@ export class ApplicationsController {
     status: HttpStatus.OK,
     description: 'Student applications retrieved successfully',
   })
-  @ApiQuery({ name: 'status', required: false, description: 'Filter by application status' })
-  @ApiQuery({ name: 'job_id', required: false, description: 'Filter by job ID' })
-  @ApiQuery({ name: 'page', required: false, type: Number, description: 'Page number (default: 1)' })
-  @ApiQuery({ name: 'limit', required: false, type: Number, description: 'Items per page (default: 10)' })
-  @ApiQuery({ name: 'sort_by', required: false, description: 'Sort field (default: submitted_at)' })
-  @ApiQuery({ name: 'sort_order', required: false, description: 'Sort order (asc/desc, default: desc)' })
+  @ApiQuery({
+    name: 'status',
+    required: false,
+    description: 'Filter by application status',
+  })
+  @ApiQuery({
+    name: 'job_id',
+    required: false,
+    description: 'Filter by job ID',
+  })
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    type: Number,
+    description: 'Page number (default: 1)',
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    type: Number,
+    description: 'Items per page (default: 10)',
+  })
+  @ApiQuery({
+    name: 'sort_by',
+    required: false,
+    description: 'Sort field (default: submitted_at)',
+  })
+  @ApiQuery({
+    name: 'sort_order',
+    required: false,
+    description: 'Sort order (asc/desc, default: desc)',
+  })
   async getMyApplications(
     @Query() searchDto: ApplicationSearchDto,
     @Request() req: any,
   ): Promise<ApplicationListResponseDto> {
-    return this.applicationsService.getStudentApplications(req.user.sub, searchDto);
+    return this.applicationsService.getStudentApplications(
+      req.user.sub,
+      searchDto,
+    );
   }
 
   @Get('recruiter-dashboard')
@@ -158,20 +199,61 @@ export class ApplicationsController {
     status: HttpStatus.OK,
     description: 'Recruiter applications retrieved successfully',
   })
-  @ApiQuery({ name: 'status', required: false, description: 'Filter by application status' })
-  @ApiQuery({ name: 'job_id', required: false, description: 'Filter by job ID' })
-  @ApiQuery({ name: 'student_id', required: false, description: 'Filter by student ID' })
-  @ApiQuery({ name: 'submitted_after', required: false, description: 'Filter applications submitted after date' })
-  @ApiQuery({ name: 'submitted_before', required: false, description: 'Filter applications submitted before date' })
-  @ApiQuery({ name: 'page', required: false, type: Number, description: 'Page number (default: 1)' })
-  @ApiQuery({ name: 'limit', required: false, type: Number, description: 'Items per page (default: 10)' })
-  @ApiQuery({ name: 'sort_by', required: false, description: 'Sort field (default: submitted_at)' })
-  @ApiQuery({ name: 'sort_order', required: false, description: 'Sort order (asc/desc, default: desc)' })
+  @ApiQuery({
+    name: 'status',
+    required: false,
+    description: 'Filter by application status',
+  })
+  @ApiQuery({
+    name: 'job_id',
+    required: false,
+    description: 'Filter by job ID',
+  })
+  @ApiQuery({
+    name: 'student_id',
+    required: false,
+    description: 'Filter by student ID',
+  })
+  @ApiQuery({
+    name: 'submitted_after',
+    required: false,
+    description: 'Filter applications submitted after date',
+  })
+  @ApiQuery({
+    name: 'submitted_before',
+    required: false,
+    description: 'Filter applications submitted before date',
+  })
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    type: Number,
+    description: 'Page number (default: 1)',
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    type: Number,
+    description: 'Items per page (default: 10)',
+  })
+  @ApiQuery({
+    name: 'sort_by',
+    required: false,
+    description: 'Sort field (default: submitted_at)',
+  })
+  @ApiQuery({
+    name: 'sort_order',
+    required: false,
+    description: 'Sort order (asc/desc, default: desc)',
+  })
   async getRecruiterApplications(
     @Query() searchDto: ApplicationSearchDto,
     @Request() req: any,
   ): Promise<ApplicationListResponseDto> {
-    return this.applicationsService.getRecruiterApplications(req.user.sub, searchDto);
+    return this.applicationsService.getRecruiterApplications(
+      req.user.sub,
+      searchDto,
+    );
   }
 
   @Get('stats')
@@ -205,7 +287,11 @@ export class ApplicationsController {
     @Param('id', ParseUUIDPipe) id: string,
     @Request() req: any,
   ): Promise<ApplicationResponseDto> {
-    return this.applicationsService.getApplicationById(id, req.user.sub, req.user.role);
+    return this.applicationsService.getApplicationById(
+      id,
+      req.user.sub,
+      req.user.role,
+    );
   }
 
   @Patch(':id')
@@ -229,7 +315,11 @@ export class ApplicationsController {
     @Body() updateApplicationDto: UpdateApplicationDto,
     @Request() req: any,
   ): Promise<ApplicationResponseDto> {
-    return this.applicationsService.updateApplication(id, updateApplicationDto, req.user.sub);
+    return this.applicationsService.updateApplication(
+      id,
+      updateApplicationDto,
+      req.user.sub,
+    );
   }
 
   @Patch(':id/withdraw')
@@ -264,16 +354,56 @@ export class ApplicationsController {
     status: HttpStatus.OK,
     description: 'All applications retrieved successfully',
   })
-  @ApiQuery({ name: 'status', required: false, description: 'Filter by application status' })
-  @ApiQuery({ name: 'job_id', required: false, description: 'Filter by job ID' })
-  @ApiQuery({ name: 'student_id', required: false, description: 'Filter by student ID' })
-  @ApiQuery({ name: 'submitted_after', required: false, description: 'Filter applications submitted after date' })
-  @ApiQuery({ name: 'submitted_before', required: false, description: 'Filter applications submitted before date' })
-  @ApiQuery({ name: 'page', required: false, type: Number, description: 'Page number (default: 1)' })
-  @ApiQuery({ name: 'limit', required: false, type: Number, description: 'Items per page (default: 10)' })
-  @ApiQuery({ name: 'sort_by', required: false, description: 'Sort field (default: submitted_at)' })
-  @ApiQuery({ name: 'sort_order', required: false, description: 'Sort order (asc/desc, default: desc)' })
-  async findAll(@Query() searchDto: ApplicationSearchDto): Promise<ApplicationListResponseDto> {
+  @ApiQuery({
+    name: 'status',
+    required: false,
+    description: 'Filter by application status',
+  })
+  @ApiQuery({
+    name: 'job_id',
+    required: false,
+    description: 'Filter by job ID',
+  })
+  @ApiQuery({
+    name: 'student_id',
+    required: false,
+    description: 'Filter by student ID',
+  })
+  @ApiQuery({
+    name: 'submitted_after',
+    required: false,
+    description: 'Filter applications submitted after date',
+  })
+  @ApiQuery({
+    name: 'submitted_before',
+    required: false,
+    description: 'Filter applications submitted before date',
+  })
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    type: Number,
+    description: 'Page number (default: 1)',
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    type: Number,
+    description: 'Items per page (default: 10)',
+  })
+  @ApiQuery({
+    name: 'sort_by',
+    required: false,
+    description: 'Sort field (default: submitted_at)',
+  })
+  @ApiQuery({
+    name: 'sort_order',
+    required: false,
+    description: 'Sort order (asc/desc, default: desc)',
+  })
+  async findAll(
+    @Query() searchDto: ApplicationSearchDto,
+  ): Promise<ApplicationListResponseDto> {
     // For admin, use recruiter method but without recruiter filter
     // You might want to create a separate admin method
     throw new Error('Admin getAllApplications method not implemented yet');

@@ -2,9 +2,11 @@ import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { ConfigService } from '@nestjs/config';
 import { Environment } from './env.schema';
 
-export const getDatabaseConfig = (configService: ConfigService<Environment>): TypeOrmModuleOptions => {
+export const getDatabaseConfig = (
+  configService: ConfigService<Environment>,
+): TypeOrmModuleOptions => {
   const isProduction = configService.get('NODE_ENV') === 'production';
-  
+
   return {
     type: 'postgres',
     url: configService.get('DATABASE_URL'),

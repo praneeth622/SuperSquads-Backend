@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException, ForbiddenException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ForbiddenException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
@@ -7,7 +12,13 @@ import { Cache } from 'cache-manager';
 import { Job, JobKind, WorkMode } from '../entities/job.entity';
 import { Company } from '../entities/company.entity';
 import { User, UserRole } from '../entities/user.entity';
-import { CreateJobDto, UpdateJobDto, JobSearchDto, JobResponseDto, JobListResponseDto } from './dto/job.dto';
+import {
+  CreateJobDto,
+  UpdateJobDto,
+  JobSearchDto,
+  JobResponseDto,
+  JobListResponseDto,
+} from './dto/job.dto';
 
 @Injectable()
 export class JobsService {
@@ -20,7 +31,10 @@ export class JobsService {
     private cacheManager: Cache,
   ) {}
 
-  async createJob(createJobDto: CreateJobDto, recruiterId: string): Promise<JobResponseDto> {
+  async createJob(
+    createJobDto: CreateJobDto,
+    recruiterId: string,
+  ): Promise<JobResponseDto> {
     // Verify company exists and recruiter has access
     const company = await this.companyRepository.findOne({
       where: { id: createJobDto.company_id },
@@ -38,21 +52,25 @@ export class JobsService {
       recruiter_id: recruiterId,
       kind: createJobDto.kind as JobKind,
       work_modes: createJobDto.work_modes as WorkMode[],
-      application_deadline: createJobDto.application_deadline 
-        ? new Date(createJobDto.application_deadline) 
+      application_deadline: createJobDto.application_deadline
+        ? new Date(createJobDto.application_deadline)
         : undefined,
     };
 
     const job = this.jobRepository.create(jobData);
     const savedJob = await this.jobRepository.save(job);
-    
+
     // Clear search cache
     await this.clearSearchCache();
-    
+
     return this.formatJobResponse(savedJob, company);
   }
 
-  async updateJob(id: string, updateJobDto: UpdateJobDto, recruiterId: string): Promise<JobResponseDto> {
+  async updateJob(
+    id: string,
+    updateJobDto: UpdateJobDto,
+    recruiterId: string,
+  ): Promise<JobResponseDto> {
     const job = await this.jobRepository.findOne({
       where: { id },
       relations: ['company'],
@@ -76,8 +94,8 @@ export class JobsService {
       ...updateJobDto,
       kind: updateJobDto.kind as JobKind | undefined,
       work_modes: updateJobDto.work_modes as WorkMode[] | undefined,
-      application_deadline: updateJobDto.application_deadline 
-        ? new Date(updateJobDto.application_deadline) 
+      application_deadline: updateJobDto.application_deadline
+        ? new Date(updateJobDto.application_deadline)
         : undefined,
       updated_at: new Date(),
     };
@@ -99,7 +117,7 @@ export class JobsService {
   async findJobById(id: string): Promise<JobResponseDto> {
     const cacheKey = `job:${id}`;
     const cached = await this.cacheManager.get<JobResponseDto>(cacheKey);
-    
+
     if (cached) {
       return cached;
     }
@@ -114,17 +132,17 @@ export class JobsService {
     }
 
     const response = this.formatJobResponse(job, job.company);
-    
+
     // Cache for 10 minutes
     await this.cacheManager.set(cacheKey, response, 600);
-    
+
     return response;
   }
 
   async searchJobs(searchDto: JobSearchDto): Promise<JobListResponseDto> {
     const cacheKey = `jobs:search:${JSON.stringify(searchDto)}`;
     const cached = await this.cacheManager.get<JobListResponseDto>(cacheKey);
-    
+
     if (cached) {
       return cached;
     }
@@ -147,7 +165,7 @@ export class JobsService {
     const jobs = await queryBuilder.getMany();
 
     const response: JobListResponseDto = {
-      jobs: jobs.map(job => this.formatJobResponse(job, job.company)),
+      jobs: jobs.map((job) => this.formatJobResponse(job, job.company)),
       total,
       page: searchDto.page,
       limit: searchDto.limit,
@@ -160,9 +178,13 @@ export class JobsService {
     return response;
   }
 
-  async getRecruiterJobs(recruiterId: string, page = 1, limit = 20): Promise<JobListResponseDto> {
+  async getRecruiterJobs(
+    recruiterId: string,
+    page = 1,
+    limit = 20,
+  ): Promise<JobListResponseDto> {
     const offset = (page - 1) * limit;
-    
+
     const [jobs, total] = await this.jobRepository.findAndCount({
       where: { recruiter_id: recruiterId },
       relations: ['company'],
@@ -172,7 +194,7 @@ export class JobsService {
     });
 
     return {
-      jobs: jobs.map(job => this.formatJobResponse(job, job.company)),
+      jobs: jobs.map((job) => this.formatJobResponse(job, job.company)),
       total,
       page,
       limit,
@@ -180,7 +202,10 @@ export class JobsService {
     };
   }
 
-  async toggleJobStatus(id: string, recruiterId: string): Promise<JobResponseDto> {
+  async toggleJobStatus(
+    id: string,
+    recruiterId: string,
+  ): Promise<JobResponseDto> {
     const job = await this.jobRepository.findOne({
       where: { id },
       relations: ['company'],
@@ -223,7 +248,7 @@ export class JobsService {
     }
 
     await this.jobRepository.delete(id);
-    
+
     // Clear cache
     await this.clearSearchCache();
     await this.cacheManager.del(`job:${id}`);
@@ -234,30 +259,46 @@ export class JobsService {
 
     if (kind === JobKind.INTERNSHIP) {
       if (min_salary || max_salary) {
-        throw new BadRequestException('Internships should use stipend, not salary');
+        throw new BadRequestException(
+          'Internships should use stipend, not salary',
+        );
       }
       if (min_stipend && max_stipend && min_stipend > max_stipend) {
-        throw new BadRequestException('Minimum stipend cannot be greater than maximum stipend');
+        throw new BadRequestException(
+          'Minimum stipend cannot be greater than maximum stipend',
+        );
       }
     } else {
       if (min_stipend || max_stipend) {
-        throw new BadRequestException('Full-time jobs should use salary, not stipend');
+        throw new BadRequestException(
+          'Full-time jobs should use salary, not stipend',
+        );
       }
       if (min_salary && max_salary && min_salary > max_salary) {
-        throw new BadRequestException('Minimum salary cannot be greater than maximum salary');
+        throw new BadRequestException(
+          'Minimum salary cannot be greater than maximum salary',
+        );
       }
     }
   }
 
   private hasCompensationFields(dto: UpdateJobDto): boolean {
-    return !!(dto.min_stipend || dto.max_stipend || dto.min_salary || dto.max_salary);
+    return !!(
+      dto.min_stipend ||
+      dto.max_stipend ||
+      dto.min_salary ||
+      dto.max_salary
+    );
   }
 
-  private applySearchFilters(queryBuilder: SelectQueryBuilder<Job>, searchDto: JobSearchDto): void {
+  private applySearchFilters(
+    queryBuilder: SelectQueryBuilder<Job>,
+    searchDto: JobSearchDto,
+  ): void {
     if (searchDto.q) {
       queryBuilder.andWhere(
         '(job.title ILIKE :search OR job.description ILIKE :search OR company.name ILIKE :search)',
-        { search: `%${searchDto.q}%` }
+        { search: `%${searchDto.q}%` },
       );
     }
 
@@ -266,64 +307,98 @@ export class JobsService {
     }
 
     if (searchDto.locations && searchDto.locations.length > 0) {
-      queryBuilder.andWhere('job.locations && :locations', { locations: searchDto.locations });
+      queryBuilder.andWhere('job.locations && :locations', {
+        locations: searchDto.locations,
+      });
     }
 
     if (searchDto.work_modes && searchDto.work_modes.length > 0) {
-      queryBuilder.andWhere('job.work_modes && :workModes', { workModes: searchDto.work_modes });
+      queryBuilder.andWhere('job.work_modes && :workModes', {
+        workModes: searchDto.work_modes,
+      });
     }
 
     if (searchDto.skills && searchDto.skills.length > 0) {
-      queryBuilder.andWhere('job.skills && :skills', { skills: searchDto.skills });
+      queryBuilder.andWhere('job.skills && :skills', {
+        skills: searchDto.skills,
+      });
     }
 
     if (searchDto.experience_level) {
-      queryBuilder.andWhere('job.experience_level = :experienceLevel', { 
-        experienceLevel: searchDto.experience_level 
+      queryBuilder.andWhere('job.experience_level = :experienceLevel', {
+        experienceLevel: searchDto.experience_level,
       });
     }
 
     if (searchDto.company_id) {
-      queryBuilder.andWhere('job.company_id = :companyId', { companyId: searchDto.company_id });
+      queryBuilder.andWhere('job.company_id = :companyId', {
+        companyId: searchDto.company_id,
+      });
     }
 
     // Compensation filters
     if (searchDto.min_stipend) {
-      queryBuilder.andWhere('job.max_stipend >= :minStipend', { minStipend: searchDto.min_stipend });
+      queryBuilder.andWhere('job.max_stipend >= :minStipend', {
+        minStipend: searchDto.min_stipend,
+      });
     }
 
     if (searchDto.max_stipend) {
-      queryBuilder.andWhere('job.min_stipend <= :maxStipend', { maxStipend: searchDto.max_stipend });
+      queryBuilder.andWhere('job.min_stipend <= :maxStipend', {
+        maxStipend: searchDto.max_stipend,
+      });
     }
 
     if (searchDto.min_salary) {
-      queryBuilder.andWhere('job.max_salary >= :minSalary', { minSalary: searchDto.min_salary });
+      queryBuilder.andWhere('job.max_salary >= :minSalary', {
+        minSalary: searchDto.min_salary,
+      });
     }
 
     if (searchDto.max_salary) {
-      queryBuilder.andWhere('job.min_salary <= :maxSalary', { maxSalary: searchDto.max_salary });
+      queryBuilder.andWhere('job.min_salary <= :maxSalary', {
+        maxSalary: searchDto.max_salary,
+      });
     }
   }
 
-  private applySorting(queryBuilder: SelectQueryBuilder<Job>, searchDto: JobSearchDto): void {
+  private applySorting(
+    queryBuilder: SelectQueryBuilder<Job>,
+    searchDto: JobSearchDto,
+  ): void {
     const { sort_by, sort_order } = searchDto;
-    
+
     switch (sort_by) {
       case 'title':
-        queryBuilder.orderBy('job.title', sort_order.toUpperCase() as 'ASC' | 'DESC');
+        queryBuilder.orderBy(
+          'job.title',
+          sort_order.toUpperCase() as 'ASC' | 'DESC',
+        );
         break;
       case 'application_count':
-        queryBuilder.orderBy('job.application_count', sort_order.toUpperCase() as 'ASC' | 'DESC');
+        queryBuilder.orderBy(
+          'job.application_count',
+          sort_order.toUpperCase() as 'ASC' | 'DESC',
+        );
         break;
       case 'updated_at':
-        queryBuilder.orderBy('job.updated_at', sort_order.toUpperCase() as 'ASC' | 'DESC');
+        queryBuilder.orderBy(
+          'job.updated_at',
+          sort_order.toUpperCase() as 'ASC' | 'DESC',
+        );
         break;
       default:
-        queryBuilder.orderBy('job.created_at', sort_order.toUpperCase() as 'ASC' | 'DESC');
+        queryBuilder.orderBy(
+          'job.created_at',
+          sort_order.toUpperCase() as 'ASC' | 'DESC',
+        );
     }
   }
 
-  private formatJobResponse(job: Job, company?: Company | null): JobResponseDto {
+  private formatJobResponse(
+    job: Job,
+    company?: Company | null,
+  ): JobResponseDto {
     return {
       id: job.id,
       title: job.title,
@@ -331,26 +406,28 @@ export class JobsService {
       description: job.description,
       requirements: job.requirements,
       responsibilities: job.responsibilities,
-      
-      company: company ? {
-        id: company.id,
-        name: company.name,
-        logo_url: company.logo_url,
-        domain: company.domain,
-      } : null,
-      
+
+      company: company
+        ? {
+            id: company.id,
+            name: company.name,
+            logo_url: company.logo_url,
+            domain: company.domain,
+          }
+        : null,
+
       min_stipend: job.min_stipend,
       max_stipend: job.max_stipend,
       min_salary: job.min_salary,
       max_salary: job.max_salary,
-      
+
       locations: job.locations,
       work_modes: job.work_modes,
       skills: job.skills,
       benefits: job.benefits,
       experience_level: job.experience_level,
       duration_months: job.duration_months,
-      
+
       application_deadline: job.application_deadline?.toISOString() || null,
       application_count: job.application_count,
       is_active: job.is_active,

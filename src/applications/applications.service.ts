@@ -1,4 +1,10 @@
-import { Injectable, NotFoundException, ForbiddenException, BadRequestException, ConflictException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ForbiddenException,
+  BadRequestException,
+  ConflictException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, SelectQueryBuilder, In } from 'typeorm';
 import { Application, ApplicationStatus } from '../entities/application.entity';
@@ -32,7 +38,10 @@ export class ApplicationsService {
     private studentProfileRepository: Repository<StudentProfile>,
   ) {}
 
-  async createApplication(createApplicationDto: CreateApplicationDto, studentId: string): Promise<ApplicationResponseDto> {
+  async createApplication(
+    createApplicationDto: CreateApplicationDto,
+    studentId: string,
+  ): Promise<ApplicationResponseDto> {
     // Check if job exists and is active
     const job = await this.jobRepository.findOne({
       where: { id: createApplicationDto.job_id, is_active: true },
@@ -64,7 +73,10 @@ export class ApplicationsService {
     let resumeFile: File | null = null;
     if (createApplicationDto.resume_file_id) {
       resumeFile = await this.fileRepository.findOne({
-        where: { id: createApplicationDto.resume_file_id, uploaded_by: studentId },
+        where: {
+          id: createApplicationDto.resume_file_id,
+          uploaded_by: studentId,
+        },
       });
 
       if (!resumeFile) {
@@ -86,7 +98,12 @@ export class ApplicationsService {
       application_count: job.application_count + 1,
     });
 
-    return this.formatApplicationResponse(savedApplication, job, null, resumeFile);
+    return this.formatApplicationResponse(
+      savedApplication,
+      job,
+      null,
+      resumeFile,
+    );
   }
 
   async updateApplication(
@@ -105,7 +122,9 @@ export class ApplicationsService {
 
     // Check if recruiter owns this job
     if (application.job.recruiter_id !== recruiterId) {
-      throw new ForbiddenException('You can only update applications for your job postings');
+      throw new ForbiddenException(
+        'You can only update applications for your job postings',
+      );
     }
 
     // Update application
@@ -122,10 +141,17 @@ export class ApplicationsService {
       relations: ['job', 'job.company'],
     });
 
-    return this.formatApplicationResponse(updatedApplication!, updatedApplication!.job);
+    return this.formatApplicationResponse(
+      updatedApplication!,
+      updatedApplication!.job,
+    );
   }
 
-  async getApplicationById(id: string, userId: string, userRole: string): Promise<ApplicationResponseDto> {
+  async getApplicationById(
+    id: string,
+    userId: string,
+    userRole: string,
+  ): Promise<ApplicationResponseDto> {
     const application = await this.applicationRepository.findOne({
       where: { id },
       relations: ['job', 'job.company', 'student'],
@@ -136,12 +162,15 @@ export class ApplicationsService {
     }
 
     // Check permissions
-    const canAccess = userRole === 'admin' ||
+    const canAccess =
+      userRole === 'admin' ||
       application.student_id === userId ||
       application.job.recruiter_id === userId;
 
     if (!canAccess) {
-      throw new ForbiddenException('You do not have permission to view this application');
+      throw new ForbiddenException(
+        'You do not have permission to view this application',
+      );
     }
 
     // Load additional data based on user role
@@ -161,10 +190,18 @@ export class ApplicationsService {
       });
     }
 
-    return this.formatApplicationResponse(application, application.job, studentProfile, resumeFile);
+    return this.formatApplicationResponse(
+      application,
+      application.job,
+      studentProfile,
+      resumeFile,
+    );
   }
 
-  async getStudentApplications(studentId: string, searchDto: ApplicationSearchDto): Promise<ApplicationListResponseDto> {
+  async getStudentApplications(
+    studentId: string,
+    searchDto: ApplicationSearchDto,
+  ): Promise<ApplicationListResponseDto> {
     const queryBuilder = this.applicationRepository
       .createQueryBuilder('application')
       .leftJoinAndSelect('application.job', 'job')
@@ -181,7 +218,9 @@ export class ApplicationsService {
     const applications = await queryBuilder.getMany();
 
     return {
-      applications: applications.map(app => this.formatApplicationResponse(app, app.job)),
+      applications: applications.map((app) =>
+        this.formatApplicationResponse(app, app.job),
+      ),
       total,
       page: searchDto.page,
       limit: searchDto.limit,
@@ -189,7 +228,10 @@ export class ApplicationsService {
     };
   }
 
-  async getRecruiterApplications(recruiterId: string, searchDto: ApplicationSearchDto): Promise<ApplicationListResponseDto> {
+  async getRecruiterApplications(
+    recruiterId: string,
+    searchDto: ApplicationSearchDto,
+  ): Promise<ApplicationListResponseDto> {
     const queryBuilder = this.applicationRepository
       .createQueryBuilder('application')
       .leftJoinAndSelect('application.job', 'job')
@@ -207,17 +249,19 @@ export class ApplicationsService {
     const applications = await queryBuilder.getMany();
 
     // Load student profiles
-    const applicationIds = applications.map(app => app.id);
-    const studentIds = applications.map(app => app.student_id);
+    const applicationIds = applications.map((app) => app.id);
+    const studentIds = applications.map((app) => app.student_id);
     const studentProfiles = await this.studentProfileRepository.find({
       where: { user_id: In(studentIds) },
       relations: ['college'],
     });
 
-    const profileMap = new Map(studentProfiles.map(profile => [profile.user_id, profile]));
+    const profileMap = new Map(
+      studentProfiles.map((profile) => [profile.user_id, profile]),
+    );
 
     return {
-      applications: applications.map(app => {
+      applications: applications.map((app) => {
         const studentProfile = profileMap.get(app.student_id);
         return this.formatApplicationResponse(app, app.job, studentProfile);
       }),
@@ -262,7 +306,10 @@ export class ApplicationsService {
     };
   }
 
-  async withdrawApplication(id: string, studentId: string): Promise<ApplicationResponseDto> {
+  async withdrawApplication(
+    id: string,
+    studentId: string,
+  ): Promise<ApplicationResponseDto> {
     const application = await this.applicationRepository.findOne({
       where: { id, student_id: studentId },
       relations: ['job', 'job.company'],
@@ -276,8 +323,14 @@ export class ApplicationsService {
       throw new BadRequestException('Application is already withdrawn');
     }
 
-    if ([ApplicationStatus.HIRED, ApplicationStatus.REJECTED].includes(application.status)) {
-      throw new BadRequestException('Cannot withdraw application that has been processed');
+    if (
+      [ApplicationStatus.HIRED, ApplicationStatus.REJECTED].includes(
+        application.status,
+      )
+    ) {
+      throw new BadRequestException(
+        'Cannot withdraw application that has been processed',
+      );
     }
 
     await this.applicationRepository.update(id, {
@@ -290,20 +343,32 @@ export class ApplicationsService {
       relations: ['job', 'job.company'],
     });
 
-    return this.formatApplicationResponse(updatedApplication!, updatedApplication!.job);
+    return this.formatApplicationResponse(
+      updatedApplication!,
+      updatedApplication!.job,
+    );
   }
 
-  private applySearchFilters(queryBuilder: SelectQueryBuilder<Application>, searchDto: ApplicationSearchDto): void {
+  private applySearchFilters(
+    queryBuilder: SelectQueryBuilder<Application>,
+    searchDto: ApplicationSearchDto,
+  ): void {
     if (searchDto.status) {
-      queryBuilder.andWhere('application.status = :status', { status: searchDto.status });
+      queryBuilder.andWhere('application.status = :status', {
+        status: searchDto.status,
+      });
     }
 
     if (searchDto.job_id) {
-      queryBuilder.andWhere('application.job_id = :jobId', { jobId: searchDto.job_id });
+      queryBuilder.andWhere('application.job_id = :jobId', {
+        jobId: searchDto.job_id,
+      });
     }
 
     if (searchDto.student_id) {
-      queryBuilder.andWhere('application.student_id = :studentId', { studentId: searchDto.student_id });
+      queryBuilder.andWhere('application.student_id = :studentId', {
+        studentId: searchDto.student_id,
+      });
     }
 
     if (searchDto.submitted_after) {
@@ -319,18 +384,30 @@ export class ApplicationsService {
     }
   }
 
-  private applySorting(queryBuilder: SelectQueryBuilder<Application>, searchDto: ApplicationSearchDto): void {
+  private applySorting(
+    queryBuilder: SelectQueryBuilder<Application>,
+    searchDto: ApplicationSearchDto,
+  ): void {
     const { sort_by, sort_order } = searchDto;
-    
+
     switch (sort_by) {
       case 'updated_at':
-        queryBuilder.orderBy('application.updated_at', sort_order.toUpperCase() as 'ASC' | 'DESC');
+        queryBuilder.orderBy(
+          'application.updated_at',
+          sort_order.toUpperCase() as 'ASC' | 'DESC',
+        );
         break;
       case 'score':
-        queryBuilder.orderBy('application.score', sort_order.toUpperCase() as 'ASC' | 'DESC');
+        queryBuilder.orderBy(
+          'application.score',
+          sort_order.toUpperCase() as 'ASC' | 'DESC',
+        );
         break;
       default:
-        queryBuilder.orderBy('application.submitted_at', sort_order.toUpperCase() as 'ASC' | 'DESC');
+        queryBuilder.orderBy(
+          'application.submitted_at',
+          sort_order.toUpperCase() as 'ASC' | 'DESC',
+        );
     }
   }
 
@@ -347,24 +424,30 @@ export class ApplicationsService {
       answers: application.answers,
       recruiter_notes: application.recruiter_notes,
       score: application.score,
-      
-      job: job ? {
-        id: job.id,
-        title: job.title,
-        kind: job.kind,
-        company: job.company ? {
-          id: job.company.id,
-          name: job.company.name,
-          logo_url: job.company.logo_url,
-        } : null,
-      } : null,
-      
-      resume_file: resumeFile ? {
-        id: resumeFile.id,
-        original_name: resumeFile.original_name,
-        public_url: resumeFile.public_url,
-      } : null,
-      
+
+      job: job
+        ? {
+            id: job.id,
+            title: job.title,
+            kind: job.kind,
+            company: job.company
+              ? {
+                  id: job.company.id,
+                  name: job.company.name,
+                  logo_url: job.company.logo_url,
+                }
+              : null,
+          }
+        : null,
+
+      resume_file: resumeFile
+        ? {
+            id: resumeFile.id,
+            original_name: resumeFile.original_name,
+            public_url: resumeFile.public_url,
+          }
+        : null,
+
       submitted_at: application.submitted_at.toISOString(),
       updated_at: application.updated_at.toISOString(),
       reviewed_at: application.reviewed_at?.toISOString() || null,
@@ -377,10 +460,12 @@ export class ApplicationsService {
         email: application.student?.email,
         profile: {
           full_name: studentProfile.full_name,
-          college: studentProfile.college ? {
-            name: studentProfile.college.name,
-            tier: studentProfile.college.tier,
-          } : null,
+          college: studentProfile.college
+            ? {
+                name: studentProfile.college.name,
+                tier: studentProfile.college.tier,
+              }
+            : null,
           degree: studentProfile.degree,
           major: studentProfile.major,
           graduation_year: studentProfile.graduation_year,

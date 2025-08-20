@@ -33,9 +33,8 @@ export class HealthController {
     const dbCheck = checks[0];
     const redisCheck = checks[1];
 
-    const isHealthy = 
-      dbCheck.status === 'fulfilled' && 
-      redisCheck.status === 'fulfilled';
+    const isHealthy =
+      dbCheck.status === 'fulfilled' && redisCheck.status === 'fulfilled';
 
     return {
       status: isHealthy ? 'ready' : 'not ready',
@@ -45,8 +44,14 @@ export class HealthController {
         redis: redisCheck.status === 'fulfilled' ? 'ok' : 'error',
       },
       details: {
-        database: dbCheck.status === 'fulfilled' ? dbCheck.value : (dbCheck as any).reason,
-        redis: redisCheck.status === 'fulfilled' ? redisCheck.value : (redisCheck as any).reason,
+        database:
+          dbCheck.status === 'fulfilled'
+            ? dbCheck.value
+            : (dbCheck as any).reason,
+        redis:
+          redisCheck.status === 'fulfilled'
+            ? redisCheck.value
+            : (redisCheck as any).reason,
       },
     };
   }
@@ -65,11 +70,11 @@ export class HealthController {
       await this.cacheManager.set('health-check', 'ok', 5000);
       const result = await this.cacheManager.get('health-check');
       await this.cacheManager.del('health-check');
-      
+
       if (result !== 'ok') {
         throw new Error('Redis read/write test failed');
       }
-      
+
       return { status: 'connected' };
     } catch (error) {
       throw new Error(`Redis connection failed: ${error.message}`);

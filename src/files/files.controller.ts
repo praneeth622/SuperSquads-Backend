@@ -49,7 +49,8 @@ export class FilesController {
   @Post('upload-url')
   @ApiOperation({
     summary: 'Generate pre-signed upload URL',
-    description: 'Creates a file record and generates a pre-signed URL for direct file upload to cloud storage. The file will be in uploading status until upload is confirmed.',
+    description:
+      'Creates a file record and generates a pre-signed URL for direct file upload to cloud storage. The file will be in uploading status until upload is confirmed.',
   })
   @ApiBody({
     type: CreateFileDto,
@@ -67,8 +68,8 @@ export class FilesController {
           tags: ['resume', '2024', 'software-engineer'],
           visibility: 'private',
           entity_type: 'application',
-          entity_id: '123e4567-e89b-12d3-a456-426614174000'
-        }
+          entity_id: '123e4567-e89b-12d3-a456-426614174000',
+        },
       },
       portfolio: {
         summary: 'Portfolio Upload',
@@ -80,34 +81,36 @@ export class FilesController {
           file_size: 10485760,
           description: 'Design portfolio showcasing recent projects',
           tags: ['portfolio', 'design', 'ui-ux'],
-          visibility: 'public'
-        }
-      }
-    }
+          visibility: 'public',
+        },
+      },
+    },
   })
   @ApiResponse({
     status: 201,
     description: 'Pre-signed upload URL generated successfully',
     type: FileUploadUrlDto,
     example: {
-      upload_url: 'https://storage.example.com/upload/2024/01/15/abc123.pdf?token=xyz789',
+      upload_url:
+        'https://storage.example.com/upload/2024/01/15/abc123.pdf?token=xyz789',
       file_id: '123e4567-e89b-12d3-a456-426614174000',
       headers: {
         'Content-Type': 'application/pdf',
-        'x-upload-token': 'upload_token_123'
+        'x-upload-token': 'upload_token_123',
       },
       expires_at: '2024-01-15T15:30:00.000Z',
-      max_file_size: 104857600
-    }
+      max_file_size: 104857600,
+    },
   })
   @ApiResponse({
     status: 400,
-    description: 'Invalid file data - file too large, unsupported MIME type, or invalid parameters',
+    description:
+      'Invalid file data - file too large, unsupported MIME type, or invalid parameters',
     example: {
       statusCode: 400,
       message: 'File size exceeds maximum allowed size of 104857600 bytes',
-      error: 'Bad Request'
-    }
+      error: 'Bad Request',
+    },
   })
   @ApiResponse({
     status: 404,
@@ -115,8 +118,8 @@ export class FilesController {
     example: {
       statusCode: 404,
       message: 'User not found',
-      error: 'Not Found'
-    }
+      error: 'Not Found',
+    },
   })
   async generateUploadUrl(
     @Request() req: any,
@@ -128,14 +131,15 @@ export class FilesController {
   @Post(':fileId/confirm')
   @ApiOperation({
     summary: 'Confirm file upload completion',
-    description: 'Confirms that file upload is complete and triggers post-processing like virus scanning and text extraction. Changes file status from uploading to processing.',
+    description:
+      'Confirms that file upload is complete and triggers post-processing like virus scanning and text extraction. Changes file status from uploading to processing.',
   })
   @ApiParam({
     name: 'fileId',
     description: 'Unique identifier of the file to confirm',
     type: 'string',
     format: 'uuid',
-    example: '123e4567-e89b-12d3-a456-426614174000'
+    example: '123e4567-e89b-12d3-a456-426614174000',
   })
   @ApiResponse({
     status: 200,
@@ -156,8 +160,8 @@ export class FilesController {
       is_public: false,
       created_at: '2024-01-15T14:30:00.000Z',
       download_url: null,
-      preview_url: null
-    }
+      preview_url: null,
+    },
   })
   @ApiResponse({
     status: 400,
@@ -165,8 +169,8 @@ export class FilesController {
     example: {
       statusCode: 400,
       message: 'File is not in uploading status',
-      error: 'Bad Request'
-    }
+      error: 'Bad Request',
+    },
   })
   @ApiResponse({
     status: 404,
@@ -174,8 +178,8 @@ export class FilesController {
     example: {
       statusCode: 404,
       message: 'File not found or access denied',
-      error: 'Not Found'
-    }
+      error: 'Not Found',
+    },
   })
   async confirmUpload(
     @Request() req: any,
@@ -187,91 +191,92 @@ export class FilesController {
   @Get()
   @ApiOperation({
     summary: 'Get user files with filtering and pagination',
-    description: 'Retrieves files belonging to the authenticated user with support for filtering by type, status, name, and other criteria. Includes pagination and sorting options.',
+    description:
+      'Retrieves files belonging to the authenticated user with support for filtering by type, status, name, and other criteria. Includes pagination and sorting options.',
   })
   @ApiQuery({
     name: 'page',
     required: false,
     type: Number,
     description: 'Page number for pagination (starts from 1)',
-    example: 1
+    example: 1,
   })
   @ApiQuery({
     name: 'limit',
     required: false,
     type: Number,
     description: 'Number of files per page (max 100)',
-    example: 20
+    example: 20,
   })
   @ApiQuery({
     name: 'filename',
     required: false,
     type: String,
     description: 'Filter by filename (partial match, case-insensitive)',
-    example: 'resume'
+    example: 'resume',
   })
   @ApiQuery({
     name: 'file_type',
     required: false,
     enum: FileType,
     description: 'Filter by file type',
-    example: 'resume'
+    example: 'resume',
   })
   @ApiQuery({
     name: 'status',
     required: false,
     enum: FileStatus,
     description: 'Filter by file status',
-    example: 'active'
+    example: 'active',
   })
   @ApiQuery({
     name: 'visibility',
     required: false,
     enum: FileVisibility,
     description: 'Filter by file visibility',
-    example: 'private'
+    example: 'private',
   })
   @ApiQuery({
     name: 'mime_type',
     required: false,
     type: String,
     description: 'Filter by MIME type',
-    example: 'application/pdf'
+    example: 'application/pdf',
   })
   @ApiQuery({
     name: 'min_size',
     required: false,
     type: Number,
     description: 'Minimum file size in bytes',
-    example: 1024
+    example: 1024,
   })
   @ApiQuery({
     name: 'max_size',
     required: false,
     type: Number,
     description: 'Maximum file size in bytes',
-    example: 10485760
+    example: 10485760,
   })
   @ApiQuery({
     name: 'tags',
     required: false,
     type: String,
     description: 'Filter by tags (comma-separated)',
-    example: 'resume,2024'
+    example: 'resume,2024',
   })
   @ApiQuery({
     name: 'entity_type',
     required: false,
     type: String,
     description: 'Filter by associated entity type',
-    example: 'application'
+    example: 'application',
   })
   @ApiQuery({
     name: 'entity_id',
     required: false,
     type: String,
     description: 'Filter by associated entity ID',
-    example: '123e4567-e89b-12d3-a456-426614174000'
+    example: '123e4567-e89b-12d3-a456-426614174000',
   })
   @ApiQuery({
     name: 'created_after',
@@ -279,7 +284,7 @@ export class FilesController {
     type: String,
     format: 'date-time',
     description: 'Filter files created after this date',
-    example: '2024-01-01T00:00:00.000Z'
+    example: '2024-01-01T00:00:00.000Z',
   })
   @ApiQuery({
     name: 'created_before',
@@ -287,7 +292,7 @@ export class FilesController {
     type: String,
     format: 'date-time',
     description: 'Filter files created before this date',
-    example: '2024-12-31T23:59:59.999Z'
+    example: '2024-12-31T23:59:59.999Z',
   })
   @ApiQuery({
     name: 'sort_by',
@@ -295,7 +300,7 @@ export class FilesController {
     type: String,
     description: 'Field to sort by',
     enum: ['created_at', 'original_name', 'size_bytes'],
-    example: 'created_at'
+    example: 'created_at',
   })
   @ApiQuery({
     name: 'sort_order',
@@ -303,7 +308,7 @@ export class FilesController {
     type: String,
     description: 'Sort order',
     enum: ['asc', 'desc'],
-    example: 'desc'
+    example: 'desc',
   })
   @ApiResponse({
     status: 200,
@@ -324,15 +329,17 @@ export class FilesController {
           uploaded_by: '456e7890-e89b-12d3-a456-426614174001',
           is_public: false,
           created_at: '2024-01-15T14:30:00.000Z',
-          download_url: 'https://storage.example.com/download/file1.pdf?token=abc123',
-          preview_url: 'https://storage.example.com/preview/file1.pdf?token=abc123'
-        }
+          download_url:
+            'https://storage.example.com/download/file1.pdf?token=abc123',
+          preview_url:
+            'https://storage.example.com/preview/file1.pdf?token=abc123',
+        },
       ],
       total: 1,
       page: 1,
       limit: 20,
-      totalPages: 1
-    }
+      totalPages: 1,
+    },
   })
   async findUserFiles(
     @Request() req: any,
@@ -350,14 +357,15 @@ export class FilesController {
   @Get(':fileId')
   @ApiOperation({
     summary: 'Get file by ID',
-    description: 'Retrieves detailed information about a specific file. User must own the file or it must be publicly accessible.',
+    description:
+      'Retrieves detailed information about a specific file. User must own the file or it must be publicly accessible.',
   })
   @ApiParam({
     name: 'fileId',
     description: 'Unique identifier of the file',
     type: 'string',
     format: 'uuid',
-    example: '123e4567-e89b-12d3-a456-426614174000'
+    example: '123e4567-e89b-12d3-a456-426614174000',
   })
   @ApiResponse({
     status: 200,
@@ -377,9 +385,10 @@ export class FilesController {
       uploaded_by: '456e7890-e89b-12d3-a456-426614174001',
       is_public: false,
       created_at: '2024-01-15T14:30:00.000Z',
-      download_url: 'https://storage.example.com/download/file1.pdf?token=abc123',
-      preview_url: 'https://storage.example.com/preview/file1.pdf?token=abc123'
-    }
+      download_url:
+        'https://storage.example.com/download/file1.pdf?token=abc123',
+      preview_url: 'https://storage.example.com/preview/file1.pdf?token=abc123',
+    },
   })
   @ApiResponse({
     status: 403,
@@ -387,8 +396,8 @@ export class FilesController {
     example: {
       statusCode: 403,
       message: 'Access denied to this file',
-      error: 'Forbidden'
-    }
+      error: 'Forbidden',
+    },
   })
   @ApiResponse({
     status: 404,
@@ -396,8 +405,8 @@ export class FilesController {
     example: {
       statusCode: 404,
       message: 'File not found',
-      error: 'Not Found'
-    }
+      error: 'Not Found',
+    },
   })
   async findFileById(
     @Request() req: any,
@@ -409,14 +418,15 @@ export class FilesController {
   @Put(':fileId')
   @ApiOperation({
     summary: 'Update file metadata',
-    description: 'Updates file metadata such as name, description, visibility, and tags. File content cannot be modified through this endpoint.',
+    description:
+      'Updates file metadata such as name, description, visibility, and tags. File content cannot be modified through this endpoint.',
   })
   @ApiParam({
     name: 'fileId',
     description: 'Unique identifier of the file to update',
     type: 'string',
     format: 'uuid',
-    example: '123e4567-e89b-12d3-a456-426614174000'
+    example: '123e4567-e89b-12d3-a456-426614174000',
   })
   @ApiBody({
     type: UpdateFileDto,
@@ -427,18 +437,18 @@ export class FilesController {
         description: 'Make a private file public',
         value: {
           visibility: 'public',
-          description: 'Portfolio showcasing recent design work - now public'
-        }
+          description: 'Portfolio showcasing recent design work - now public',
+        },
       },
       'update-tags': {
         summary: 'Update Tags and Description',
         description: 'Add new tags and update description',
         value: {
           tags: ['resume', '2024', 'senior-developer', 'react'],
-          description: 'Updated resume highlighting React expertise'
-        }
-      }
-    }
+          description: 'Updated resume highlighting React expertise',
+        },
+      },
+    },
   })
   @ApiResponse({
     status: 200,
@@ -457,8 +467,8 @@ export class FilesController {
       scan_status: 'clean',
       uploaded_by: '456e7890-e89b-12d3-a456-426614174001',
       is_public: true,
-      created_at: '2024-01-15T14:30:00.000Z'
-    }
+      created_at: '2024-01-15T14:30:00.000Z',
+    },
   })
   @ApiResponse({
     status: 404,
@@ -466,8 +476,8 @@ export class FilesController {
     example: {
       statusCode: 404,
       message: 'File not found or access denied',
-      error: 'Not Found'
-    }
+      error: 'Not Found',
+    },
   })
   async updateFile(
     @Request() req: any,
@@ -481,18 +491,19 @@ export class FilesController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({
     summary: 'Delete file',
-    description: 'Soft deletes a file by marking it as deleted. The file will be scheduled for permanent removal from storage. This action cannot be undone.',
+    description:
+      'Soft deletes a file by marking it as deleted. The file will be scheduled for permanent removal from storage. This action cannot be undone.',
   })
   @ApiParam({
     name: 'fileId',
     description: 'Unique identifier of the file to delete',
     type: 'string',
     format: 'uuid',
-    example: '123e4567-e89b-12d3-a456-426614174000'
+    example: '123e4567-e89b-12d3-a456-426614174000',
   })
   @ApiResponse({
     status: 204,
-    description: 'File deleted successfully (no content returned)'
+    description: 'File deleted successfully (no content returned)',
   })
   @ApiResponse({
     status: 404,
@@ -500,8 +511,8 @@ export class FilesController {
     example: {
       statusCode: 404,
       message: 'File not found or access denied',
-      error: 'Not Found'
-    }
+      error: 'Not Found',
+    },
   })
   async deleteFile(
     @Request() req: any,
@@ -513,31 +524,34 @@ export class FilesController {
   @Get(':fileId/download-url')
   @ApiOperation({
     summary: 'Get secure download URL',
-    description: 'Generates a temporary download URL for a file. The URL expires after 24 hours and requires the file to have passed security scanning.',
+    description:
+      'Generates a temporary download URL for a file. The URL expires after 24 hours and requires the file to have passed security scanning.',
   })
   @ApiParam({
     name: 'fileId',
     description: 'Unique identifier of the file',
     type: 'string',
     format: 'uuid',
-    example: '123e4567-e89b-12d3-a456-426614174000'
+    example: '123e4567-e89b-12d3-a456-426614174000',
   })
   @ApiResponse({
     status: 200,
     description: 'Download URL generated successfully',
     example: {
-      download_url: 'https://storage.example.com/download/2024/01/15/abc123.pdf?token=secure_token_xyz',
-      expires_at: '2024-01-16T14:30:00.000Z'
-    }
+      download_url:
+        'https://storage.example.com/download/2024/01/15/abc123.pdf?token=secure_token_xyz',
+      expires_at: '2024-01-16T14:30:00.000Z',
+    },
   })
   @ApiResponse({
     status: 400,
-    description: 'File not available for download (wrong status or failed security scan)',
+    description:
+      'File not available for download (wrong status or failed security scan)',
     example: {
       statusCode: 400,
       message: 'File has not passed security scan',
-      error: 'Bad Request'
-    }
+      error: 'Bad Request',
+    },
   })
   @ApiResponse({
     status: 404,
@@ -545,8 +559,8 @@ export class FilesController {
     example: {
       statusCode: 404,
       message: 'File not found',
-      error: 'Not Found'
-    }
+      error: 'Not Found',
+    },
   })
   async getDownloadUrl(
     @Request() req: any,
@@ -558,20 +572,21 @@ export class FilesController {
   @Get('entity/:entityType/:entityId')
   @ApiOperation({
     summary: 'Get files by entity',
-    description: 'Retrieves all files associated with a specific entity (job, application, etc.). Returns public files or files owned by the authenticated user.',
+    description:
+      'Retrieves all files associated with a specific entity (job, application, etc.). Returns public files or files owned by the authenticated user.',
   })
   @ApiParam({
     name: 'entityType',
     description: 'Type of entity (e.g., job, application, company)',
     type: 'string',
-    example: 'application'
+    example: 'application',
   })
   @ApiParam({
     name: 'entityId',
     description: 'Unique identifier of the entity',
     type: 'string',
     format: 'uuid',
-    example: '123e4567-e89b-12d3-a456-426614174000'
+    example: '123e4567-e89b-12d3-a456-426614174000',
   })
   @ApiResponse({
     status: 200,
@@ -589,7 +604,7 @@ export class FilesController {
         entity_type: 'application',
         entity_id: '123e4567-e89b-12d3-a456-426614174000',
         uploaded_by: '456e7890-e89b-12d3-a456-426614174001',
-        created_at: '2024-01-15T14:30:00.000Z'
+        created_at: '2024-01-15T14:30:00.000Z',
       },
       {
         id: '222e2222-e89b-12d3-a456-426614174000',
@@ -602,22 +617,27 @@ export class FilesController {
         entity_type: 'application',
         entity_id: '123e4567-e89b-12d3-a456-426614174000',
         uploaded_by: '456e7890-e89b-12d3-a456-426614174001',
-        created_at: '2024-01-15T15:00:00.000Z'
-      }
-    ]
+        created_at: '2024-01-15T15:00:00.000Z',
+      },
+    ],
   })
   async findFilesByEntity(
     @Request() req: any,
     @Param('entityType') entityType: string,
     @Param('entityId', ParseUUIDPipe) entityId: string,
   ): Promise<any[]> {
-    return this.filesService.findFilesByEntity(entityType, entityId, req.user.userId);
+    return this.filesService.findFilesByEntity(
+      entityType,
+      entityId,
+      req.user.userId,
+    );
   }
 
   @Get('stats/overview')
   @ApiOperation({
     summary: 'Get file statistics',
-    description: 'Retrieves comprehensive statistics about files for the authenticated user, including storage usage, file counts by type and status, and recent activity.',
+    description:
+      'Retrieves comprehensive statistics about files for the authenticated user, including storage usage, file counts by type and status, and recent activity.',
   })
   @ApiResponse({
     status: 200,
@@ -634,7 +654,7 @@ export class FilesController {
         certificate: 4,
         profile_picture: 1,
         document: 8,
-        other: 1
+        other: 1,
       },
       by_status: {
         uploading: 0,
@@ -642,7 +662,7 @@ export class FilesController {
         processing: 1,
         archived: 1,
         deleted: 0,
-        failed: 0
+        failed: 0,
       },
       recent_uploads: 8,
       average_file_size: 2097152,
@@ -650,20 +670,20 @@ export class FilesController {
         {
           file_type: 'portfolio',
           count: 2,
-          total_size: 20971520
+          total_size: 20971520,
         },
         {
           file_type: 'document',
           count: 8,
-          total_size: 16777216
+          total_size: 16777216,
         },
         {
           file_type: 'resume',
           count: 3,
-          total_size: 6291456
-        }
-      ]
-    }
+          total_size: 6291456,
+        },
+      ],
+    },
   })
   async getFileStats(@Request() req: any): Promise<any> {
     return this.filesService.getFileStats(req.user.userId);
