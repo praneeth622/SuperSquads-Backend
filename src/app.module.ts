@@ -60,18 +60,27 @@ import { getRedisConfig } from './config/redis.config';
     // Logging
     LoggerModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: (configService: ConfigService<Environment>) => ({
-        pinoHttp: {
-          level: configService.get('LOG_LEVEL'),
-          transport: {
-            target: 'pino-pretty',
-            options: {
-              colorize: true,
-              singleLine: true,
-            },
+      useFactory: (configService: ConfigService<Environment>) => {
+        const nodeEnv = configService.get('NODE_ENV');
+        const isDevelopment = nodeEnv === 'development';
+        
+        return {
+          pinoHttp: {
+            level: configService.get('LOG_LEVEL'),
+            ...(isDevelopment && {
+              transport: {
+                target: 'pino-pretty',
+                options: {
+                  colorize: true,
+                  singleLine: true,
+                  translateTime: 'HH:MM:ss Z',
+                  ignore: 'pid,hostname',
+                },
+              },
+            }),
           },
-        },
-      }),
+        };
+      },
       inject: [ConfigService],
     }),
 

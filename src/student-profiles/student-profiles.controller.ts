@@ -33,6 +33,9 @@ import {
   ExperienceLevel,
 } from './dto/student-profile.dto';
 import { VerificationStatus } from '../entities/student-profile.entity';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { Roles } from '../auth/decorators/roles.decorator';
 
 @ApiTags('Student Profiles')
 @ApiBearerAuth()
@@ -49,6 +52,7 @@ export class StudentProfilesController {
   ) {}
 
   @Post()
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({
     summary: 'Create student profile',
     description:
@@ -285,6 +289,7 @@ export class StudentProfilesController {
   }
 
   @Get('me')
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({
     summary: 'Get current user profile',
     description: "Retrieve the authenticated user's student profile",

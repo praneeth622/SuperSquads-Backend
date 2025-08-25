@@ -12,7 +12,7 @@ export const getDatabaseConfig = (
     url: configService.get('DATABASE_URL'),
     entities: [__dirname + '/../entities/*.entity{.ts,.js}'],
     migrations: [__dirname + '/../migrations/*{.ts,.js}'],
-    synchronize: false, // Always use migrations in production
+    synchronize: !isProduction, // Use synchronize in development for convenience
     logging: !isProduction,
     ssl: isProduction ? { rejectUnauthorized: false } : false,
     extra: {

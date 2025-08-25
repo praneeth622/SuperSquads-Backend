@@ -345,6 +345,256 @@ export class SkillsController {
     return this.skillsService.getSkillBySlug(slug);
   }
 
+  @Get('my-skills')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Get user skills',
+    description: 'Retrieves skills for the current user with filtering options',
+  })
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    type: Number,
+    description: 'Page number for pagination',
+    example: 1,
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    type: Number,
+    description: 'Number of skills per page',
+    example: 20,
+  })
+  @ApiQuery({
+    name: 'category',
+    required: false,
+    enum: [
+      'programming',
+      'framework',
+      'database',
+      'cloud',
+      'tool',
+      'soft_skill',
+      'domain',
+      'other',
+    ],
+    description: 'Filter by skill category',
+    example: 'programming',
+  })
+  @ApiQuery({
+    name: 'proficiency_level',
+    required: false,
+    enum: ['beginner', 'intermediate', 'advanced', 'expert'],
+    description: 'Filter by proficiency level',
+    example: 'intermediate',
+  })
+  @ApiQuery({
+    name: 'source',
+    required: false,
+    enum: ['manual', 'ai_extract', 'assessment', 'project', 'endorsed'],
+    description: 'Filter by skill source',
+    example: 'manual',
+  })
+  @ApiQuery({
+    name: 'is_verified',
+    required: false,
+    type: Boolean,
+    description: 'Filter by verified status',
+    example: true,
+  })
+  @ApiQuery({
+    name: 'search',
+    required: false,
+    type: String,
+    description: 'Search by skill name',
+    example: 'React',
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'User skills retrieved successfully',
+    schema: {
+      type: 'object',
+      properties: {
+        skills: {
+          type: 'array',
+          items: { $ref: '#/components/schemas/StudentSkillResponseDto' },
+        },
+        total: { type: 'number', example: 25 },
+        page: { type: 'number', example: 1 },
+        limit: { type: 'number', example: 20 },
+        total_pages: { type: 'number', example: 2 },
+      },
+    },
+  })
+  @ApiProduces('application/json')
+  async getUserSkills(
+    @Query() searchDto: StudentSkillSearchDto,
+    @Req() request: Request,
+  ) {
+    const userId = request.user?.['sub'] || request.user?.['id'];
+    return this.skillsService.getStudentSkills(userId, searchDto);
+  }
+
+  @Get('my-skills/stats')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Get user skills statistics',
+    description:
+      "Retrieves comprehensive statistics about the current user's skills",
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'User skills statistics retrieved successfully',
+    type: StudentSkillStatsDto,
+  })
+  @ApiProduces('application/json')
+  async getUserSkillStats(
+    @Req() request: Request,
+  ): Promise<StudentSkillStatsDto> {
+    const userId = request.user?.['sub'] || request.user?.['id'];
+    return this.skillsService.getStudentSkillStats(userId);
+  }
+
+  @Get('my-skills/:id')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Get specific user skill',
+    description: "Retrieves a specific skill from the current user's profile",
+  })
+  @ApiParam({
+    name: 'id',
+    type: String,
+    format: 'uuid',
+    description: 'Student skill UUID',
+    example: '550e8400-e29b-41d4-a716-446655440000',
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'User skill retrieved successfully',
+    type: StudentSkillResponseDto,
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Skill not found in user profile',
+  })
+  @ApiProduces('application/json')
+  async getUserSkill(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Req() request: Request,
+  ): Promise<StudentSkillResponseDto> {
+    const userId = request.user?.['sub'] || request.user?.['id'];
+    return this.skillsService.getStudentSkillById(userId, id);
+  }
+
+  @Patch('my-skills/:id')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Update user skill',
+    description: "Updates a skill in the current user's profile",
+  })
+  @ApiParam({
+    name: 'id',
+    type: String,
+    format: 'uuid',
+    description: 'Student skill UUID',
+    example: '550e8400-e29b-41d4-a716-446655440000',
+  })
+  @ApiBody({
+    type: UpdateStudentSkillDto,
+    description: 'Student skill update data',
+    examples: {
+      'Update Proficiency': {
+        summary: 'Update skill proficiency',
+        value: {
+          proficiency_level: 'advanced',
+          years_of_experience: 4,
+          notes:
+            'Recently completed advanced course and worked on enterprise project',
+        },
+      },
+      'Add Assessment Score': {
+        summary: 'Add assessment score',
+        value: {
+          assessment_score: 88,
+          source: 'assessment',
+          is_verified: true,
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'User skill updated successfully',
+    type: StudentSkillResponseDto,
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Skill not found in user profile',
+  })
+  @ApiConsumes('application/json')
+  @ApiProduces('application/json')
+  async updateUserSkill(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body(ValidationPipe) updateStudentSkillDto: UpdateStudentSkillDto,
+    @Req() request: Request,
+  ): Promise<StudentSkillResponseDto> {
+    const userId = request.user?.['sub'] || request.user?.['id'];
+    return this.skillsService.updateStudentSkill(
+      userId,
+      id,
+      updateStudentSkillDto,
+    );
+  }
+
+  @Delete('my-skills/:id')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Remove skill from profile',
+    description: "Removes a skill from the current user's profile",
+  })
+  @ApiParam({
+    name: 'id',
+    type: String,
+    format: 'uuid',
+    description: 'Student skill UUID',
+    example: '550e8400-e29b-41d4-a716-446655440000',
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Skill removed from profile successfully',
+    schema: {
+      type: 'object',
+      properties: {
+        success: { type: 'boolean', example: true },
+        message: {
+          type: 'string',
+          example: 'Skill removed from profile successfully',
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Skill not found in user profile',
+  })
+  @ApiProduces('application/json')
+  async removeUserSkill(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Req() request: Request,
+  ) {
+    const userId = request.user?.['sub'] || request.user?.['id'];
+    await this.skillsService.removeStudentSkill(userId, id);
+    return {
+      success: true,
+      message: 'Skill removed from profile successfully',
+    };
+  }
+
   @Get(':id')
   @ApiOperation({
     summary: 'Get skill by ID',
@@ -601,255 +851,5 @@ export class SkillsController {
   ) {
     const userId = request.user?.['sub'] || request.user?.['id'];
     return this.skillsService.addBulkStudentSkills(userId, bulkSkillsDto);
-  }
-
-  @Get('my-skills')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
-  @ApiOperation({
-    summary: 'Get user skills',
-    description: 'Retrieves skills for the current user with filtering options',
-  })
-  @ApiQuery({
-    name: 'page',
-    required: false,
-    type: Number,
-    description: 'Page number for pagination',
-    example: 1,
-  })
-  @ApiQuery({
-    name: 'limit',
-    required: false,
-    type: Number,
-    description: 'Number of skills per page',
-    example: 20,
-  })
-  @ApiQuery({
-    name: 'category',
-    required: false,
-    enum: [
-      'programming',
-      'framework',
-      'database',
-      'cloud',
-      'tool',
-      'soft_skill',
-      'domain',
-      'other',
-    ],
-    description: 'Filter by skill category',
-    example: 'programming',
-  })
-  @ApiQuery({
-    name: 'proficiency_level',
-    required: false,
-    enum: ['beginner', 'intermediate', 'advanced', 'expert'],
-    description: 'Filter by proficiency level',
-    example: 'intermediate',
-  })
-  @ApiQuery({
-    name: 'source',
-    required: false,
-    enum: ['manual', 'ai_extract', 'assessment', 'project', 'endorsed'],
-    description: 'Filter by skill source',
-    example: 'manual',
-  })
-  @ApiQuery({
-    name: 'is_verified',
-    required: false,
-    type: Boolean,
-    description: 'Filter by verified status',
-    example: true,
-  })
-  @ApiQuery({
-    name: 'search',
-    required: false,
-    type: String,
-    description: 'Search by skill name',
-    example: 'React',
-  })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: 'User skills retrieved successfully',
-    schema: {
-      type: 'object',
-      properties: {
-        skills: {
-          type: 'array',
-          items: { $ref: '#/components/schemas/StudentSkillResponseDto' },
-        },
-        total: { type: 'number', example: 25 },
-        page: { type: 'number', example: 1 },
-        limit: { type: 'number', example: 20 },
-        total_pages: { type: 'number', example: 2 },
-      },
-    },
-  })
-  @ApiProduces('application/json')
-  async getUserSkills(
-    @Query() searchDto: StudentSkillSearchDto,
-    @Req() request: Request,
-  ) {
-    const userId = request.user?.['sub'] || request.user?.['id'];
-    return this.skillsService.getStudentSkills(userId, searchDto);
-  }
-
-  @Get('my-skills/stats')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
-  @ApiOperation({
-    summary: 'Get user skills statistics',
-    description:
-      "Retrieves comprehensive statistics about the current user's skills",
-  })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: 'User skills statistics retrieved successfully',
-    type: StudentSkillStatsDto,
-  })
-  @ApiProduces('application/json')
-  async getUserSkillStats(
-    @Req() request: Request,
-  ): Promise<StudentSkillStatsDto> {
-    const userId = request.user?.['sub'] || request.user?.['id'];
-    return this.skillsService.getStudentSkillStats(userId);
-  }
-
-  @Get('my-skills/:id')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
-  @ApiOperation({
-    summary: 'Get specific user skill',
-    description: "Retrieves a specific skill from the current user's profile",
-  })
-  @ApiParam({
-    name: 'id',
-    type: String,
-    format: 'uuid',
-    description: 'Student skill UUID',
-    example: '550e8400-e29b-41d4-a716-446655440000',
-  })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: 'User skill retrieved successfully',
-    type: StudentSkillResponseDto,
-  })
-  @ApiResponse({
-    status: HttpStatus.NOT_FOUND,
-    description: 'Skill not found in user profile',
-  })
-  @ApiProduces('application/json')
-  async getUserSkill(
-    @Param('id', ParseUUIDPipe) id: string,
-    @Req() request: Request,
-  ): Promise<StudentSkillResponseDto> {
-    const userId = request.user?.['sub'] || request.user?.['id'];
-    return this.skillsService.getStudentSkillById(userId, id);
-  }
-
-  @Patch('my-skills/:id')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
-  @ApiOperation({
-    summary: 'Update user skill',
-    description: "Updates a skill in the current user's profile",
-  })
-  @ApiParam({
-    name: 'id',
-    type: String,
-    format: 'uuid',
-    description: 'Student skill UUID',
-    example: '550e8400-e29b-41d4-a716-446655440000',
-  })
-  @ApiBody({
-    type: UpdateStudentSkillDto,
-    description: 'Student skill update data',
-    examples: {
-      'Update Proficiency': {
-        summary: 'Update skill proficiency',
-        value: {
-          proficiency_level: 'advanced',
-          years_of_experience: 4,
-          notes:
-            'Recently completed advanced course and worked on enterprise project',
-        },
-      },
-      'Add Assessment Score': {
-        summary: 'Add assessment score',
-        value: {
-          assessment_score: 88,
-          source: 'assessment',
-          is_verified: true,
-        },
-      },
-    },
-  })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: 'User skill updated successfully',
-    type: StudentSkillResponseDto,
-  })
-  @ApiResponse({
-    status: HttpStatus.NOT_FOUND,
-    description: 'Skill not found in user profile',
-  })
-  @ApiConsumes('application/json')
-  @ApiProduces('application/json')
-  async updateUserSkill(
-    @Param('id', ParseUUIDPipe) id: string,
-    @Body(ValidationPipe) updateStudentSkillDto: UpdateStudentSkillDto,
-    @Req() request: Request,
-  ): Promise<StudentSkillResponseDto> {
-    const userId = request.user?.['sub'] || request.user?.['id'];
-    return this.skillsService.updateStudentSkill(
-      userId,
-      id,
-      updateStudentSkillDto,
-    );
-  }
-
-  @Delete('my-skills/:id')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
-  @ApiOperation({
-    summary: 'Remove skill from profile',
-    description: "Removes a skill from the current user's profile",
-  })
-  @ApiParam({
-    name: 'id',
-    type: String,
-    format: 'uuid',
-    description: 'Student skill UUID',
-    example: '550e8400-e29b-41d4-a716-446655440000',
-  })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: 'Skill removed from profile successfully',
-    schema: {
-      type: 'object',
-      properties: {
-        success: { type: 'boolean', example: true },
-        message: {
-          type: 'string',
-          example: 'Skill removed from profile successfully',
-        },
-      },
-    },
-  })
-  @ApiResponse({
-    status: HttpStatus.NOT_FOUND,
-    description: 'Skill not found in user profile',
-  })
-  @ApiProduces('application/json')
-  async removeUserSkill(
-    @Param('id', ParseUUIDPipe) id: string,
-    @Req() request: Request,
-  ) {
-    const userId = request.user?.['sub'] || request.user?.['id'];
-    await this.skillsService.removeStudentSkill(userId, id);
-    return {
-      success: true,
-      message: 'Skill removed from profile successfully',
-    };
   }
 }

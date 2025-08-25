@@ -1,5 +1,5 @@
 # Multi-stage build for production
-FROM node:18-alpine AS base
+FROM node:20-alpine AS base
 
 # Set working directory
 WORKDIR /app
@@ -25,7 +25,7 @@ RUN npm run build
 RUN npm prune --production
 
 # Production stage
-FROM node:18-alpine AS production
+FROM node:20-alpine AS production
 
 # Install dumb-init for proper signal handling
 RUN apk add --no-cache dumb-init

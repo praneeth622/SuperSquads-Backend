@@ -52,17 +52,17 @@ export const JobSearchSchema = z.object({
   experience_level: z.enum(['entry', 'mid', 'senior', 'expert']).optional(),
 
   // Compensation filters
-  min_stipend: z.number().int().positive().optional(),
-  max_stipend: z.number().int().positive().optional(),
-  min_salary: z.number().int().positive().optional(),
-  max_salary: z.number().int().positive().optional(),
+  min_stipend: z.coerce.number().int().positive().optional(),
+  max_stipend: z.coerce.number().int().positive().optional(),
+  min_salary: z.coerce.number().int().positive().optional(),
+  max_salary: z.coerce.number().int().positive().optional(),
 
   // Company filter
   company_id: z.string().uuid().optional(),
 
   // Pagination
-  page: z.number().int().positive().default(1),
-  limit: z.number().int().positive().max(100).default(20),
+  page: z.coerce.number().int().positive().default(1),
+  limit: z.coerce.number().int().positive().max(100).default(20),
 
   // Sorting
   sort_by: z
